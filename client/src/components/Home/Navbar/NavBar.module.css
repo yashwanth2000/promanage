@@ -1,0 +1,165 @@
+:root {
+  font-size: 16px;
+}
+
+.navbar {
+  width: 12rem;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #ffffff;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border-right: 1px solid #edf5fe;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.logoIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.title {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #474444;
+  text-align: center;
+  letter-spacing: 0.125rem;
+  cursor: pointer;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  color: #707070;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  text-align: center;
+  font-family: "Poppins";
+  border: none;
+  background: none;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.link.isActive {
+  background-color: #4391ed1a;
+  width: 12rem;
+  border-radius: 5px;
+} 
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+
+.logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.logout img {
+  width: 0.9rem;
+  height: 0.9rem;
+  cursor: pointer;
+}
+.logoutButton {
+  color: #cf3636;
+  width: 5rem;
+  height: 1.875rem;
+  text-align: center;
+  font-family: "Poppins";
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 20%;
+  max-height: 30%;
+  width: 400px;
+  text-align: center;
+}
+
+.modal p {
+  color: #000000;
+  font-family: "Noto Sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+}
+.modalButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.modalButtons button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.modalButtons button:first-child {
+  background-color: #17a2b8;
+  color: white;
+  box-shadow: 0px 2px 12px 0px #82698c33;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.modalButtons button:last-child {
+  background-color: #ffffff;
+  color: #cf3636;
+  border: 1px solid #cf3636;
+  border-radius: 12px;
+  width: 100%;
+}
