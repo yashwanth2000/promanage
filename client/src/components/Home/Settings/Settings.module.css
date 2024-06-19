@@ -1,0 +1,169 @@
+.settingsContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  min-height: 100vh;
+  width: calc(100% - 11.25rem);
+  margin-left: 11.25rem;
+}
+
+.settingsContainer h2 {
+  color: #000000;
+  font-family: "Open Sans", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: left;
+  margin-left: 2.3rem;
+}
+
+.updateForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.inputIcon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: auto;
+  pointer-events: none;
+}
+
+.inputField {
+  padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+  margin-left: 0;
+  font-size: 1rem;
+  width: 100%;
+  outline: none;
+  border: 1.38px solid #d0d0d0;
+  border-radius: 11.03px;
+}
+
+.error {
+  color: red;
+  font-size: 1.2rem;
+  margin-top: 0.2rem;
+  margin-left: 0.5rem;
+}
+
+.showIcon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: auto;
+  cursor: pointer;
+}
+
+.button {
+  padding: 0.5rem;
+  background-color: #17a2b8;
+  color: #fff;
+  border: none;
+  font-weight: 400;
+  font-size: 1rem;
+  font-family: "Open Sans", sans-serif;
+  cursor: pointer;
+  border-radius: 55px;
+  width: 100%;
+  height: auto;
+  margin-top: 1.2rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.delButton {
+  background-color: #cf3636;
+  padding: 0.5rem;
+  color: #fff;
+  border: none;
+  font-weight: 400;
+  font-size: 1rem;
+  font-family: "Open Sans", sans-serif;
+  cursor: pointer;
+  border-radius: 55px;
+  width: 100%;
+  height: auto;
+  margin-top: 1.2rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 20%;
+  max-height: 30%;
+  width: 400px;
+  text-align: center;
+}
+
+.modal p {
+  color: #000000;
+  font-family: "Noto Sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+}
+.modalButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.modalButtons button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.modalButtons button:first-child {
+  background-color: #17a2b8;
+  color: white;
+  box-shadow: 0px 2px 12px 0px #82698c33;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.modalButtons button:last-child {
+  background-color: #ffffff;
+  color: #cf3636;
+  border: 1px solid #cf3636;
+  border-radius: 12px;
+  width: 100%;
+}

@@ -4,7 +4,7 @@ import errorHandler from "../utils/error.js";
 
 export const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id).select("-password");
     if (!user) {
       return next(errorHandler(404, "User not found"));
     }
@@ -12,7 +12,7 @@ export const getUserById = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
 
 export const updateUser = async (req, res, next) => {
   try {
@@ -62,13 +62,11 @@ export const updateUser = async (req, res, next) => {
 
     const updatedUser = await user.save();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: updateMessage.trim(),
-        user: updatedUser,
-      });
+    res.status(200).json({
+      success: true,
+      message: updateMessage.trim(),
+      user: updatedUser,
+    });
   } catch (error) {
     console.log(error);
     next(errorHandler(500, "Internal Server Error"));

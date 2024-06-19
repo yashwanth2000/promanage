@@ -1,0 +1,76 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  min-height: 100vh;
+  width: calc(100% - 11.25rem);
+  margin-left: 11.25rem;
+}
+
+.container h2 {
+  color: #000000;
+  font-family: "Open Sans", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: left;
+  margin-left: 2rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1.8rem;
+}
+
+.content div {
+  width: 25%;
+  padding: 1rem;
+  margin-right: 1rem;
+}
+
+.firstList,
+.secondList {
+  background-color: #f9fcff;
+  border-radius: 10px;
+  padding: 1.8rem;
+}
+
+.firstList li,
+.secondList li {
+  position: relative;
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.firstList li span,
+.secondList li span {
+  margin-left: 2em; 
+  display: inline-block;
+}
+
+.firstList li::before,
+.secondList li::before {
+  margin-left: 0.8rem;
+  content: "•";
+  color: #90c4cc;
+  font-size: 2em;
+  position: absolute;
+  left: -1em;
+  top: -0.3em;
+}
+
+.content ul li {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 1rem;
+}
+
+.content ul li span {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  color: #000000;
+}

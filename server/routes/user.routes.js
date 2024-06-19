@@ -1,6 +1,10 @@
 import express from "express";
 const router = express.Router();
-import { updateUser, deleteUser,getUserById } from "../controller/user.controller.js";
+import {
+  updateUser,
+  deleteUser,
+  getUserById,
+} from "../controller/user.controller.js";
 import verifyToken from "../utils/verifyToken.js";
 
 router.put("/update/:id", verifyToken, updateUser);

@@ -1,8 +1,6 @@
 import axios from "axios";
 const backendUrl = import.meta.env.VITE_SERVER_URL;
-import Cookies from "js-cookie";
-
-const token = Cookies.get("accessToken");
+const token = localStorage.getItem("accessToken");
 
 export const getUserId = async (userId) => {
   try {

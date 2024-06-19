@@ -33,6 +33,8 @@ export const login = async ({ email, password }) => {
     });
 
     Cookies.set("accessToken", response.data.token);
+    localStorage.setItem("accessToken", response.data.token);
+
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -52,6 +54,7 @@ export const logout = async () => {
     const response = await axios.get(reqUrl);
 
     Cookies.remove("accessToken");
+    localStorage.removeItem("accessToken");
     return response.data;
   } catch (error) {
     if (error.response) {
