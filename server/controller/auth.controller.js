@@ -43,7 +43,7 @@ export const login = async (req, res, next) => {
     const { password: pass, ...userData } = validUser._doc;
 
     res
-      .cookie("access_token", token, { httpOnly: true })
+      .cookie("accessToken", token, { httpOnly: true })
       .status(200)
       .json({success: true, user: userData, token });
   } catch (error) {
@@ -53,7 +53,7 @@ export const login = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    res.clearCookie("access_token");
+    res.clearCookie("accessToken");
     res.status(200).json({success: true, message: "User Logged out successfully" });
   } catch (error) {
     next(errorHandler(500, "Internal Server Error"));

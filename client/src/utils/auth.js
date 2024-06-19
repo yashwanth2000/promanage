@@ -32,7 +32,7 @@ export const login = async ({ email, password }) => {
       password,
     });
 
-    Cookies.set("access_token", response.data.token);
+    Cookies.set("accessToken", response.data.token);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -51,7 +51,7 @@ export const logout = async () => {
     const reqUrl = `${backendUrl}/api/auth/logout`;
     const response = await axios.get(reqUrl);
 
-    Cookies.remove("access_token");
+    Cookies.remove("accessToken");
     return response.data;
   } catch (error) {
     if (error.response) {

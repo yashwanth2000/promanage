@@ -4,8 +4,9 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 const app = express();
 
@@ -22,7 +23,6 @@ app.use(cors());
 // );
 
 const PORT = process.env.PORT || 3000;
-// console.log("MONGODB_URL:", process.env.MONGODB_URL);
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
@@ -37,6 +37,7 @@ mongoose
   });
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

@@ -5,6 +5,7 @@ import "./App.css";
 import Board from "./components/Home/Board/Board";
 import Analytics from "./components/Home/Analytics/Analytics";
 import Settings from "./components/Home/Settings/Settings";
+import PrivateRoute from "./utils/PrivateRoute";
 
 const App = () => {
   return (
@@ -12,9 +13,11 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/home" element={<Board />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/home" element={<Board />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
