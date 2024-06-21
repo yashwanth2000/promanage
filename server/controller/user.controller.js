@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import errorHandler from "../utils/error.js";
+import jwt from "jsonwebtoken";
 
 export const getUserById = async (req, res, next) => {
   try {
@@ -11,6 +12,28 @@ export const getUserById = async (req, res, next) => {
     res.status(200).json(user);
   } catch (error) {
     next(error);
+  }
+};
+
+export const getCurrentUserData = async (req, res, next) => {
+  try {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+      return next(errorHandler(401, "Access Denied: No Token Provided"));
+    }
+
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(verified.id).select("-password");
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, "Internal Server Error"));
   }
 };
 
@@ -25,15 +48,18 @@ export const updateUser = async (req, res, next) => {
     }
 
     let updateMessage = "";
+    let isUpdated = false;
 
-    if (name) {
+    if (name && name !== user.name) {
       user.name = name;
       updateMessage += "Name updated. ";
+      isUpdated = true;
     }
 
-    if (email) {
+    if (email && email !== user.email) {
       user.email = email;
       updateMessage += "Email updated. ";
+      isUpdated = true;
     }
 
     if (newPassword) {
@@ -51,13 +77,23 @@ export const updateUser = async (req, res, next) => {
         return next(errorHandler(401, "Invalid old password"));
       }
 
+      if (oldPassword === newPassword) {
+        return next(
+          errorHandler(
+            400,
+            "New password must be different from the old password"
+          )
+        );
+      }
+
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedPassword;
       updateMessage += "Password updated. ";
+      isUpdated = true;
     }
 
-    if (!name && !email && !newPassword) {
-      return next(errorHandler(400, "No valid fields to update"));
+    if (!isUpdated) {
+      return next(errorHandler(400, "No changes detected."));
     }
 
     const updatedUser = await user.save();

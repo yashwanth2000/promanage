@@ -1,13 +1,15 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import nameIcon from "../../assets/name.png";
 import emailIcon from "../../assets/email.png";
 import passwordIcon from "../../assets/lock.png";
 import showIcon from "../../assets/eye.png";
 import { register } from "../../utils/auth";
+import { toast, ToastContainer } from "react-toastify";
 
 const Register = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,6 +26,20 @@ const Register = () => {
     general: "",
   });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.deleted) {
+      toast.success("Account deleted successfully", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -170,6 +186,7 @@ const Register = () => {
       <Link to="/" className={styles.loginLink}>
         Login
       </Link>
+      <ToastContainer />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Login.module.css";
 import emailIcon from "../../assets/email.png";
@@ -49,6 +49,19 @@ const Login = () => {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    if (location.state?.passwordChanged) {
+      toast.success("Password changed. Please login", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

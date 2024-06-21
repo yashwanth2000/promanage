@@ -55,13 +55,6 @@
   border-radius: 11.03px;
 }
 
-.error {
-  color: red;
-  font-size: 1.2rem;
-  margin-top: 0.2rem;
-  margin-left: 0.5rem;
-}
-
 .showIcon {
   position: absolute;
   top: 50%;

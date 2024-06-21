@@ -2,9 +2,9 @@ import axios from "axios";
 const backendUrl = import.meta.env.VITE_SERVER_URL;
 const token = localStorage.getItem("accessToken");
 
-export const getUserId = async (userId) => {
+export const getUserDataById = async (userId) => {
   try {
-    const reqUrl = `${backendUrl}/api/users/get/${userId}`;
+    const reqUrl = `${backendUrl}/api/user/get/${userId}`;
     const response = await axios.get(reqUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -22,15 +22,12 @@ export const getUserId = async (userId) => {
   }
 };
 
-export const updateUser = async (userId, data) => {
+export const getUserData = async () => {
   try {
-    const reqUrl = `${backendUrl}/api/users/update/${userId}`;
-    const response = await axios.put(reqUrl, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const reqUrl = `${backendUrl}/api/user/me`;
+    const response = await axios.get(reqUrl, {
+      withCredentials: true,
     });
-    console.log("User updated successfully:", response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -43,13 +40,30 @@ export const updateUser = async (userId, data) => {
   }
 };
 
+export const updateUser = async (userId, data) => {
+  try {
+    const reqUrl = `${backendUrl}/api/user/update/${userId}`;
+    const response = await axios.put(reqUrl, data, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error response:", error.response.data);
+      throw error;
+    } else if (error.request) {
+      console.error("Error request:", error.request);
+    } else {
+      console.error("Error message:", error.message);
+    }
+  }
+};
+
 export const deleteUser = async (userId) => {
   try {
-    const reqUrl = `${backendUrl}/api/users/delete/${userId}`;
+    const reqUrl = `${backendUrl}/api/user/delete/${userId}`;
     const response = await axios.delete(reqUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      withCredentials: true,
     });
     console.log("User deleted successfully:", response.data);
     return response.data;

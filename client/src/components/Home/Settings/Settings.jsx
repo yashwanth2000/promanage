@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavBar from "../Navbar/NavBar";
 import nameIcon from "../../../assets/name.png";
 import emailIcon from "../../../assets/email.png";
 import passwordIcon from "../../../assets/lock.png";
 import showIcon from "../../../assets/eye.png";
 import styles from "./Settings.module.css";
+import { getUserData, updateUser, deleteUser } from "../../../utils/user";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -15,15 +19,48 @@ const Settings = () => {
     oldPassword: "",
     newPassword: "",
   });
+
+  const [userId, setUserId] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await getUserData();
+        const user = response;
+        setUserId(user._id);
+        setFormData({
+          name: user.name,
+          email: user.email,
+          oldPassword: "",
+          newPassword: "",
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const toggleModal = () => {
     setShowModal(!showModal);
   };
 
-  const handleDeleteAccount = () => {
-    // Handle account deletion logic
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await deleteUser(userId);
+      if (response.success) {
+        localStorage.removeItem("accessToken");
+        Cookies.remove("accessToken");
+        navigate("/register", { state: { deleted: true } });
+      } else {
+        console.error("Error deleting account:", response.message);
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    }
   };
 
   const handleChange = (e) => {
@@ -38,11 +75,40 @@ const Settings = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
-    if (formData.email || !formData.oldPassword || !formData.newPassword) {
-      toast.error("One of the field must be filled", {
+    try {
+      const response = await updateUser(userId, formData);
+      if (response.success) {
+        toast.success("Profile updated successfully", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+
+        if (formData.newPassword) {
+          localStorage.removeItem("accessToken");
+          Cookies.remove("accessToken");
+          navigate("/", { state: { passwordChanged: true } });
+        }
+
+        setFormData({
+          ...formData,
+          oldPassword: "",
+          newPassword: "",
+        });
+      } else {
+        console.error("Error updating profile:", response.message);
+      }
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message || "Failed to update profile";
+      toast.error(errorMsg, {
         position: "top-right",
         autoClose: 1000,
         hideProgressBar: false,
@@ -51,9 +117,8 @@ const Settings = () => {
         draggable: true,
         theme: "light",
       });
-      return;
+      console.error("Error updating profile:", error);
     }
-    console.log(formData);
   };
 
   return (
@@ -61,7 +126,7 @@ const Settings = () => {
       <NavBar />
       <div className={styles.settingsContainer}>
         <h2>Settings</h2>
-        <form onSubmit={handleSubmit} className={styles.updateForm}>
+        <form onSubmit={handleUpdate} className={styles.updateForm}>
           <div className={styles.inputContainer}>
             <img src={nameIcon} alt="Name Icon" className={styles.inputIcon} />
             <input

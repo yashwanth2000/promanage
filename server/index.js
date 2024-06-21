@@ -6,21 +6,19 @@ import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: "../.env" });
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
 
-// console.log("CLIENT_URL:", process.env.CLIENT_URL);
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_URL,
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 const PORT = process.env.PORT || 3000;
 mongoose
