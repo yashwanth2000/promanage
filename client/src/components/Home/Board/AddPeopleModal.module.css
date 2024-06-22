@@ -1,0 +1,106 @@
+.modalBackdrop {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  height: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modalContent h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  font-family: "Noto Sans", sans-serif;
+}
+
+.emailInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: "Noto Sans", sans-serif;
+  color: #000;
+  outline: none;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.closeButton,
+.addButton,
+.confirmButton {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0px 2px 12px 0px #82698c33;
+}
+
+.closeButton {
+  background-color: #ffffff;
+  color: #f44336;
+  border: 1px solid #cf3636;
+}
+
+.addButton,
+.closeButton {
+  width: 100%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.addButton,
+.confirmButton {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.confirmContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmButton {
+  margin: 10px 0;
+  width: 200px;
+}
+
+.confirmText {
+  font-size: 25px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.error {
+  color: #cf3636;
+  font-size: 15px;
+  font-weight: 400;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 10px;
+}

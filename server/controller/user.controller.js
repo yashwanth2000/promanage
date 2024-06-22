@@ -15,28 +15,6 @@ export const getUserById = async (req, res, next) => {
   }
 };
 
-export const getCurrentUserData = async (req, res, next) => {
-  try {
-    const token = req.cookies.accessToken;
-
-    if (!token) {
-      return next(errorHandler(401, "Access Denied: No Token Provided"));
-    }
-
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findById(verified.id).select("-password");
-    if (!user) {
-      return next(errorHandler(404, "User not found"));
-    }
-
-    res.status(200).json(user);
-  } catch (error) {
-    console.log(error);
-    next(errorHandler(500, "Internal Server Error"));
-  }
-};
-
 export const updateUser = async (req, res, next) => {
   try {
     const { name, email, oldPassword, newPassword } = req.body;
@@ -97,14 +75,14 @@ export const updateUser = async (req, res, next) => {
     }
 
     const updatedUser = await user.save();
+    const { password, ...userData } = updatedUser._doc;
 
     res.status(200).json({
       success: true,
       message: updateMessage.trim(),
-      user: updatedUser,
+      user: userData,
     });
   } catch (error) {
-    console.log(error);
     next(errorHandler(500, "Internal Server Error"));
   }
 };
@@ -121,7 +99,6 @@ export const deleteUser = async (req, res, next) => {
       .status(200)
       .json({ success: true, message: "User deleted successfully" });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

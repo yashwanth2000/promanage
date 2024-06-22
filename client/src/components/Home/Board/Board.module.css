@@ -1,0 +1,136 @@
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  min-height: 100vh;
+  width: calc(100% - 11.25rem);
+  margin-left: 11.25rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.mainContent {
+  flex-grow: 1;
+  padding: 5px;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  text-transform: capitalize;
+}
+
+.header h1 {
+  font-size: 30px;
+  font-weight: 600;
+  color: #000;
+}
+
+.header p {
+  font-size: 16px;
+  font-weight: 500;
+  color: #707070;
+}
+
+.boardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.boardHeaderLeft {
+  display: flex;
+  align-items: center;
+}
+
+.boardHeaderLeft h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin-right: 20px;
+}
+
+.peopleIcon {
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+}
+
+.addButton {
+  color: #000;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.timeFilter {
+  padding: 5px 10px;
+  border: none;
+  background: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 400;
+  color: #000;
+  font-family: "Poppins", sans-serif;
+}
+
+.timeFilter option {
+  font-size: 12px;
+  font-weight: 500;
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0px 2px 22px 0px #7e7a7a40;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 5px;
+}
+
+.columns {
+  display: flex;
+  gap: 20px;
+}
+
+.column {
+  width: 320px;
+  background-color: #eef2f5;
+  padding: 20px; 
+  border-radius: 10px;
+  min-height: 520px;
+}
+
+
+.column h3 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.taskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.taskHeader img {
+  cursor: pointer;
+}
+
+.plusIcon {
+  width: 18px;
+  height: 18px;
+  margin-right: 20px;
+}
+
+.cardPlaceholder {
+  height: 150px; 
+  background-color: #fff;
+  border-radius: 5px;
+  margin-top: 10px;
+  position: relative;
+  border-radius: 15px;
+}
+

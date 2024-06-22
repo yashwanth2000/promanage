@@ -1,48 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import NavBar from "../Navbar/NavBar";
 import nameIcon from "../../../assets/name.png";
 import emailIcon from "../../../assets/email.png";
 import passwordIcon from "../../../assets/lock.png";
 import showIcon from "../../../assets/eye.png";
 import styles from "./Settings.module.css";
-import { getUserData, updateUser, deleteUser } from "../../../utils/user";
+import { updateUser, deleteUser } from "../../../utils/user";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const Settings = () => {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: user.name,
+    email: user.email,
     oldPassword: "",
     newPassword: "",
   });
 
-  const [userId, setUserId] = useState("");
+  const userId = user._id;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await getUserData();
-        const user = response;
-        setUserId(user._id);
-        setFormData({
-          name: user.name,
-          email: user.email,
-          oldPassword: "",
-          newPassword: "",
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchUserData();
-  }, []);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -83,13 +64,15 @@ const Settings = () => {
       if (response.success) {
         toast.success("Profile updated successfully", {
           position: "top-right",
-          autoClose: 1000,
+          autoClose: 500,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           theme: "light",
         });
+
+        localStorage.setItem("user", JSON.stringify(response.user));
 
         if (formData.newPassword) {
           localStorage.removeItem("accessToken");
@@ -110,7 +93,7 @@ const Settings = () => {
         error.response?.data?.message || "Failed to update profile";
       toast.error(errorMsg, {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,

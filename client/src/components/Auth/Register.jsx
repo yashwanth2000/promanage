@@ -31,7 +31,7 @@ const Register = () => {
     if (location.state?.deleted) {
       toast.success("Account deleted successfully", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,

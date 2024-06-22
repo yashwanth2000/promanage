@@ -32,9 +32,6 @@ export const login = async ({ email, password }) => {
       password,
     });
 
-    Cookies.set("accessToken", response.data.token);
-    localStorage.setItem("accessToken", response.data.token);
-
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -55,6 +52,7 @@ export const logout = async () => {
 
     Cookies.remove("accessToken");
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
     return response.data;
   } catch (error) {
     if (error.response) {

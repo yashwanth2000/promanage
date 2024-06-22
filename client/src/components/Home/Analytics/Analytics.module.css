@@ -25,7 +25,6 @@
 .content div {
   width: 25%;
   padding: 1rem;
-  margin-right: 1rem;
 }
 
 .firstList,
@@ -40,25 +39,30 @@
   position: relative;
   list-style-type: none;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-}
-
-.firstList li span,
-.secondList li span {
-  margin-left: 2em; 
-  display: inline-block;
+  padding-left: 1.5em;
 }
 
 .firstList li::before,
 .secondList li::before {
-  margin-left: 0.8rem;
   content: "•";
   color: #90c4cc;
   font-size: 2em;
   position: absolute;
-  left: -1em;
-  top: -0.3em;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.label {
+  margin-right: auto;
+}
+
+.value {
+  text-align: right;
+  min-width: 2em;
 }
 
 .content ul li {
@@ -66,7 +70,6 @@
   font-size: 16px;
   font-weight: 400;
   color: #000000;
-  margin-bottom: 1rem;
 }
 
 .content ul li span {

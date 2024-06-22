@@ -5,6 +5,7 @@ import emailIcon from "../../assets/email.png";
 import passwordIcon from "../../assets/lock.png";
 import showIcon from "../../assets/eye.png";
 import { login } from "../../utils/auth";
+import Cookies from "js-cookie";
 import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
@@ -25,7 +26,7 @@ const Login = () => {
     if (location.state?.registered) {
       toast.success("Registered successfully. Please login", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -39,7 +40,7 @@ const Login = () => {
     if (location.state?.loggedOut) {
       toast.success("Logged out successfully", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -53,7 +54,7 @@ const Login = () => {
     if (location.state?.passwordChanged) {
       toast.success("Password changed. Please login", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -93,6 +94,9 @@ const Login = () => {
       try {
         const response = await login(formData);
         if (response.success) {
+          Cookies.set("accessToken", response.token);
+          localStorage.setItem("accessToken", response.token);
+          localStorage.setItem("user", JSON.stringify(response.user));
           navigate("/home", { state: { loggedIn: true } });
         }
       } catch (error) {

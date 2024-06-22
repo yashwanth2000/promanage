@@ -11,16 +11,20 @@ const Analytics = () => {
           <div>
             <ul className={styles.firstList}>
               <li>
-                Backlog Tasks <span>0</span>
+                <span className={styles.label}>Backlog Tasks</span>
+                <span className={styles.value}>0</span>
               </li>
               <li>
-                To-do Tasks <span>0</span>
+                <span className={styles.label}>To-do Tasks</span>
+                <span className={styles.value}>0</span>
               </li>
               <li>
-                In-Progress Tasks <span>0</span>
+                <span className={styles.label}>In-Progress Tasks</span>
+                <span className={styles.value}>0</span>
               </li>
               <li>
-                Completed Tasks <span>0</span>
+                <span className={styles.label}>Completed Tasks</span>
+                <span className={styles.value}>0</span>
               </li>
             </ul>
           </div>
@@ -28,16 +32,20 @@ const Analytics = () => {
           <div>
             <ul className={styles.secondList}>
               <li>
-                Low Priority <span>0</span>
+                <span className={styles.label}>Low Priority</span>
+                <span className={styles.value}>0</span>
               </li>
               <li>
-                Moderate Priority <span>0</span>
+                <span className={styles.label}>Moderate Priority</span>
+                <span className={styles.value}>0</span>
               </li>
               <li>
-                High Priority <span>0</span>
+                <span className={styles.label}>High Priority</span>
+                <span className={styles.value}>0</span>
               </li>
               <li>
-                Due Date Tasks <span>0</span>
+                <span className={styles.label}>Due Date Tasks</span>
+                <span className={styles.value}>0</span>
               </li>
             </ul>
           </div>

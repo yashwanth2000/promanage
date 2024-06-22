@@ -22,24 +22,6 @@ export const getUserDataById = async (userId) => {
   }
 };
 
-export const getUserData = async () => {
-  try {
-    const reqUrl = `${backendUrl}/api/user/me`;
-    const response = await axios.get(reqUrl, {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      console.error("Error response:", error.response.data);
-    } else if (error.request) {
-      console.error("Error request:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
-  }
-};
-
 export const updateUser = async (userId, data) => {
   try {
     const reqUrl = `${backendUrl}/api/user/update/${userId}`;
@@ -65,7 +47,6 @@ export const deleteUser = async (userId) => {
     const response = await axios.delete(reqUrl, {
       withCredentials: true,
     });
-    console.log("User deleted successfully:", response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
