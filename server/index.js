@@ -5,9 +5,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
+import path from "path";
 
 dotenv.config({ path: "../.env" });
-
+const __dirname = path.resolve();
 const app = express();
 
 app.use(express.json());
@@ -36,6 +37,14 @@ mongoose
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+
+const frontEndPath = path.join(__dirname, "../client/dist");
+
+app.use(express.static(frontEndPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontEndPath, "index.html"));
+})
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
