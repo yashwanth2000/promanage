@@ -1,60 +1,59 @@
 import axios from "axios";
 const backendUrl = import.meta.env.VITE_SERVER_URL;
-const token = localStorage.getItem("accessToken");
+
+const getToken = () => localStorage.getItem("accessToken");
+
+const axiosInstance = axios.create({
+  baseURL: backendUrl,
+});
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const getUserDataById = async (userId) => {
   try {
-    const reqUrl = `${backendUrl}/api/user/get/${userId}`;
-    const response = await axios.get(reqUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axiosInstance.get(`/api/user/get/${userId}`);
     return response.data;
   } catch (error) {
-    if (error.response) {
-      console.error("Error response:", error.response.data);
-    } else if (error.request) {
-      console.error("Error request:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
+    console.error("Error fetching user data:", error);
+    throw error;
   }
 };
 
 export const updateUser = async (userId, data) => {
   try {
-    const reqUrl = `${backendUrl}/api/user/update/${userId}`;
-    const response = await axios.put(reqUrl, data, {
-      withCredentials: true,
-    });
+    const response = await axiosInstance.put(
+      `/api/user/update/${userId}`,
+      data
+    );
+    if (response.data.token) {
+      localStorage.setItem("accessToken", response.data.token);
+    }
+
     return response.data;
   } catch (error) {
-    if (error.response) {
-      console.error("Error response:", error.response.data);
-      throw error;
-    } else if (error.request) {
-      console.error("Error request:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
+    console.error("Error updating user:", error);
+    throw error;
   }
 };
 
 export const deleteUser = async (userId) => {
   try {
-    const reqUrl = `${backendUrl}/api/user/delete/${userId}`;
-    const response = await axios.delete(reqUrl, {
-      withCredentials: true,
-    });
+    const response = await axiosInstance.delete(`/api/user/delete/${userId}`);
+    localStorage.removeItem("accessToken");
     return response.data;
   } catch (error) {
-    if (error.response) {
-      console.error("Error response:", error.response.data);
-    } else if (error.request) {
-      console.error("Error request:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
+    console.error("Error deleting user:", error);
+    throw error;
   }
 };

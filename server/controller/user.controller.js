@@ -77,10 +77,18 @@ export const updateUser = async (req, res, next) => {
     const updatedUser = await user.save();
     const { password, ...userData } = updatedUser._doc;
 
+    let token = null;
+    if (newPassword) {
+      token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: updateMessage.trim(),
       user: userData,
+      token: token,
     });
   } catch (error) {
     next(errorHandler(500, "Internal Server Error"));
@@ -94,7 +102,7 @@ export const deleteUser = async (req, res, next) => {
         errorHandler(403, "You are not authorized to delete this account")
       );
     await User.findByIdAndDelete(req.params.id);
-    res.clearCookie("accessToken");
+
     res
       .status(200)
       .json({ success: true, message: "User deleted successfully" });
