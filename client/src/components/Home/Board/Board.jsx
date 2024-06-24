@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavBar from "../Navbar/NavBar";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import peopleIcon from "../../../assets/addpeople.png";
 import collapseAllIcon from "../../../assets/collapse-all.png";
 import plusIcon from "../../../assets/plus.png";
 import AddPeopleModal from "./AddPeopleModal";
+import CreateTaskModal from "./CreateTaskModal";
 import styles from "./Board.module.css";
 
 const Board = () => {
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user"));
   const [showAddPeopleModal, setShowAddPeopleModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [addedEmails, setAddedEmails] = useState([]);
 
   useEffect(() => {
     if (location.state?.loggedIn) {
@@ -26,14 +28,30 @@ const Board = () => {
         theme: "light",
       });
     }
+
+    const storedEmails = JSON.parse(localStorage.getItem("addedEmails")) || [];
+    setAddedEmails(storedEmails);
   }, [location.state]);
 
   const toggleAddPeopleModal = () => {
     setShowAddPeopleModal(!showAddPeopleModal);
   };
 
+  const handleOpenCreateTaskModal = () => {
+    setShowCreateTaskModal(true);
+  };
+
   const handleAddPeople = (email) => {
-    console.log(email);
+    const updatedEmails = [...addedEmails, email];
+    setAddedEmails(updatedEmails);
+    localStorage.setItem("addedEmails", JSON.stringify(updatedEmails));
+  };
+
+  const handleSaveTask = (taskData) => {
+    // Here you would typically save the task to your backend or state management system
+    console.log("New task:", taskData);
+    // For now, we'll just close the modal
+    setShowCreateTaskModal(false);
   };
 
   const options = { day: "2-digit", month: "short", year: "numeric" };
@@ -56,7 +74,12 @@ const Board = () => {
             <div className={styles.boardHeaderLeft}>
               <h2>Board</h2>
               <img src={peopleIcon} alt="Add" className={styles.peopleIcon} />
-              <button className={styles.addButton} onClick={toggleAddPeopleModal}>Add People</button>
+              <button
+                className={styles.addButton}
+                onClick={toggleAddPeopleModal}
+              >
+                Add People
+              </button>
             </div>
             <select className={styles.timeFilter} defaultValue="This week">
               <option>Today</option>
@@ -70,31 +93,32 @@ const Board = () => {
                 <h3>Backlog</h3>
                 <img src={collapseAllIcon} alt="Collapse All" />
               </div>
-              {/* <div className={styles.cardPlaceholder}></div> */}
             </div>
             <div className={styles.column}>
               <div className={styles.taskHeader}>
                 <h3>To do</h3>
                 <div>
-                  <img src={plusIcon} alt="Plus" className={styles.plusIcon} />
+                  <img
+                    src={plusIcon}
+                    alt="Plus"
+                    className={styles.plusIcon}
+                    onClick={handleOpenCreateTaskModal}
+                  />
                   <img src={collapseAllIcon} alt="Collapse All" />
                 </div>
               </div>
-              {/* <div className={styles.cardPlaceholder}></div> */}
             </div>
             <div className={styles.column}>
               <div className={styles.taskHeader}>
                 <h3>In Progress</h3>
                 <img src={collapseAllIcon} alt="Collapse All" />
               </div>
-              {/* <div className={styles.cardPlaceholder}></div> */}
             </div>
             <div className={styles.column}>
               <div className={styles.taskHeader}>
                 <h3>Done</h3>
                 <img src={collapseAllIcon} alt="Collapse All" />
               </div>
-              {/* <div className={styles.cardPlaceholder}></div> */}
             </div>
           </div>
         </main>
@@ -103,6 +127,12 @@ const Board = () => {
         show={showAddPeopleModal}
         onClose={toggleAddPeopleModal}
         onAdd={handleAddPeople}
+      />
+      <CreateTaskModal
+        isOpen={showCreateTaskModal}
+        onClose={() => setShowCreateTaskModal(false)}
+        onSave={handleSaveTask}
+        addedEmails={addedEmails}
       />
     </>
   );
