@@ -3,13 +3,14 @@ import styles from "./CreateTaskModal.module.css";
 import DatePicker from "react-datepicker";
 import plusIcon from "../../../assets/plus.png";
 import deleteIcon from "../../../assets/delete.png";
+import downArrow from "../../../assets/arrowDown.png";
 import PropTypes from "prop-types";
 
 const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
   const [formData, setFormData] = useState({
     title: "",
     priority: null,
-    assignee: "",
+    assignedTo: "",
     checklist: [],
     dueDate: null,
   });
@@ -77,7 +78,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
     setFormData({
       title: "",
       priority: null,
-      assignee: "",
+      assignedTo: "",
       checklist: [],
       dueDate: null,
     });
@@ -121,11 +122,29 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
       return;
     }
 
-    onSave(formData);
+    let priorityValue;
+    switch (formData.priority) {
+      case "HIGH PRIORITY":
+        priorityValue = "high";
+        break;
+      case "MODERATE PRIORITY":
+        priorityValue = "moderate";
+        break;
+      case "LOW PRIORITY":
+        priorityValue = "low";
+        break;
+    }
+
+    const formattedData = {
+      ...formData,
+      priority: priorityValue,
+    };
+
+    onSave(formattedData);
     setFormData({
       title: "",
       priority: null,
-      assignee: "",
+      assignedTo: "",
       checklist: [],
       dueDate: null,
     });
@@ -133,7 +152,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
   };
 
   const handleAssigneeSelect = (email) => {
-    handleInputChange("assignee", email);
+    handleInputChange("assignedTo", email);
     setIsAssigneeDropdownOpen(false);
   };
 
@@ -195,21 +214,21 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
           </div>
 
           <div className={styles.assignSection}>
-            <p>Assign to</p>
-            <div
-              className={styles.assignDropdown}
-              onClick={() => setIsAssigneeDropdownOpen(!isAssigneeDropdownOpen)}
-            >
-              {formData.assignee ? (
-                <div className={styles.selectedAssignee}>
-                  <span className={styles.assigneeInitials}>
-                    {formData.assignee.substring(0, 2).toUpperCase()}
-                  </span>
-                  <span>{formData.assignee}</span>
-                </div>
-              ) : (
-                <span>Add an assignee</span>
-              )}
+            <div className={styles.assignHeader}>
+              <p>Assign to</p>
+              <div
+                className={styles.assignDropdown}
+                onClick={() => {
+                  setIsAssigneeDropdownOpen(!isAssigneeDropdownOpen);
+                }}
+              >
+                <span>{formData.assignedTo || "Add an assignee"}</span>
+                <img
+                  src={downArrow}
+                  className={styles.downArrow}
+                  alt="Down Arrow"
+                />
+              </div>
             </div>
             {isAssigneeDropdownOpen && (
               <div className={styles.dropdownList}>
@@ -222,7 +241,8 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
                     <span className={styles.assigneeInitials}>
                       {email.substring(0, 2).toUpperCase()}
                     </span>
-                    {email}
+                    <span className={styles.emailText}>{email}</span>
+                    <button className={styles.assignButton}>Assign</button>
                   </div>
                 ))}
               </div>
@@ -284,6 +304,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
                 selected={formData.dueDate}
                 onChange={(date) => handleInputChange("dueDate", date)}
                 placeholderText="Select Due Date"
+                dateFormat={"dd/MM/yyyy"}
                 className={styles.datePicker}
               />
             </div>
