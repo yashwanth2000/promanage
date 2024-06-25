@@ -41,3 +41,15 @@ export const getAllTasks = async (filter = "week") => {
     throw error;
   }
 };
+
+export const deleteTask = async (taskId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/api/task/deleteTask/${taskId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    throw error;
+  }
+};

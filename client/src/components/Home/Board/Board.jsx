@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect ,} from "react";
 import NavBar from "../Navbar/NavBar";
 import { useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -6,9 +6,10 @@ import peopleIcon from "../../../assets/addpeople.png";
 import collapseAllIcon from "../../../assets/collapse-all.png";
 import plusIcon from "../../../assets/plus.png";
 import downArrow from "../../../assets/arrowDown.png";
+import moreIcon from "../../../assets/threeDot.png";
 import AddPeopleModal from "./AddPeopleModal";
 import CreateTaskModal from "./CreateTaskModal";
-import { createTask, getAllTasks } from "../../../utils/task";
+import { createTask, getAllTasks, deleteTask } from "../../../utils/task";
 import styles from "./Board.module.css";
 
 const Board = () => {
@@ -20,6 +21,22 @@ const Board = () => {
   const [tasks, setTasks] = useState([]);
   const [timeFilter, setTimeFilter] = useState("week");
   const [visibleSubtasks, setVisibleSubtasks] = useState({});
+  const [activeMenu, setActiveMenu] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
+  const handleMenuToggle = (taskId, event) => {
+    setActiveMenu(activeMenu === taskId ? null : taskId);
+    const rect = event.target.getBoundingClientRect();
+    setMenuPosition({
+      top: rect.top + window.scrollY,
+      left: rect.left + window.scrollX,
+    });
+  };
+
+  const handleMenuAction = (action, taskId) => {
+    console.log(action, taskId);
+    setActiveMenu(null);
+  };
 
   useEffect(() => {
     if (location.state?.loggedIn) {
@@ -28,7 +45,7 @@ const Board = () => {
         autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: true,
         theme: "light",
       });
@@ -73,7 +90,7 @@ const Board = () => {
           autoClose: 500,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
+          pauseOnHover: false,
           draggable: true,
           theme: "light",
         });
@@ -85,13 +102,38 @@ const Board = () => {
         autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: true,
         theme: "light",
       });
       console.error("Error creating task:", error);
     }
     setShowCreateTaskModal(false);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(taskId);
+      toast.success("Task deleted successfully", {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      fetchTasks();
+    } catch (error) {
+      toast.error("Failed to delete task", {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+    }
   };
 
   const handleShowSubTasks = (taskId) => {
@@ -140,17 +182,68 @@ const Board = () => {
     return dueDate < today;
   };
 
+  const getPriorityLabel = (priority) => {
+    switch (priority.toLowerCase()) {
+      case "low":
+        return "LOW PRIORITY";
+      case "moderate":
+        return "MODERATE PRIORITY";
+      case "high":
+        return "HIGH PRIORITY";
+    }
+  };
+
+  const getInitials = (email) => {
+    const [name] = email.split("@");
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const handleSubtaskToggle = (taskId, subtaskId) => {
+    console.log(`Toggled subtask ${subtaskId} for task ${taskId}`);
+  };
+
   const renderTasks = (status) => {
     return tasks
       .filter((task) => task.status.toLowerCase() === status.toLowerCase())
       .map((task) => (
         <div key={task._id} className={styles.taskCard}>
-          <div
-            className={`${styles.priorityIndicator} ${
-              styles[task.priority.toLowerCase()]
-            }`}
-          >
-            <p>{task.priority}</p>
+          <div className={styles.taskHeader}>
+            <div className={styles.priorityContainer}>
+              <div
+                className={`${styles.priorityIndicator} ${
+                  styles[task.priority.toLowerCase()]
+                }`}
+              />
+              <p className={styles.priorityLabel}>
+                {getPriorityLabel(task.priority)}
+              </p>
+              {task.assignedTo && (
+                <div className={styles.assigneeAvatar}>
+                  {getInitials(task.assignedTo)}
+                </div>
+              )}
+            </div>
+            <img
+              src={moreIcon}
+              alt="More"
+              className={styles.moreIcon}
+              onClick={(e) => handleMenuToggle(task._id, e)}
+            />
+            {activeMenu === task._id && (
+              <div
+                className={styles.taskMenu}
+                style={{ top: menuPosition.top + 24, left: menuPosition.left }}
+              >
+                <p onClick={() => handleMenuAction("edit", task._id)}>Edit</p>
+                <p onClick={() => handleMenuAction("share", task._id)}>Share</p>
+                <p
+                  onClick={() => handleDeleteTask(task._id)}
+                  className={styles.delete}
+                >
+                  Delete
+                </p>
+              </div>
+            )}
           </div>
           <h4>{task.title}</h4>
           <div className={styles.taskChecklistContainer}>
@@ -163,40 +256,64 @@ const Board = () => {
               <img
                 src={downArrow}
                 alt="Down Arrow"
-                className={styles.downArrow}
+                className={`${styles.downArrow} ${
+                  visibleSubtasks[task._id] ? styles.rotated : ""
+                }`}
                 onClick={() => handleShowSubTasks(task._id)}
               />
-              {visibleSubtasks[task._id] && (
-                <div>
-                  {task.checklist.map((item) => (
-                    <p key={item._id} className={styles.subTasks}>
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        className={styles.checkbox}
-                      />
-                      {item.task}
-                    </p>
-                  ))}
-                </div>
-              )}
             </div>
+            {visibleSubtasks[task._id] && (
+              <div className={styles.subtaskList}>
+                {task.checklist.map((item) => (
+                  <div key={item._id} className={styles.subtaskItem}>
+                    <input
+                      type="checkbox"
+                      checked={item.completed}
+                      onChange={() => handleSubtaskToggle(task._id, item._id)}
+                      className={styles.subtaskCheckbox}
+                    />
+                    <span className={styles.subtaskText}>{item.task}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className={styles.taskFooter}>
             <span
               className={`${styles.dueDate} ${
-                task.dueDate && isPastDate(task.dueDate)
-                  ? styles.pastDueDate
-                  : ""
+                task.dueDate
+                  ? isPastDate(task.dueDate)
+                    ? styles.pastDueDate
+                    : ""
+                  : styles.hidden
               }`}
             >
               {task.dueDate && formattedDueDate(task.dueDate)}
             </span>
-
             <div className={styles.statusContainer}>
-              <span>BACKLOG</span>
-              <span>PROGRESS</span>
-              <span>DONE</span>
+              <span
+                className={
+                  status.toLowerCase() === "backlog" ? styles.activeStatus : ""
+                }
+              >
+                BACKLOG
+              </span>
+              <span
+                className={
+                  status.toLowerCase() === "in progress"
+                    ? styles.activeStatus
+                    : ""
+                }
+              >
+                PROGRESS
+              </span>
+              <span
+                className={
+                  status.toLowerCase() === "done" ? styles.activeStatus : ""
+                }
+              >
+                DONE
+              </span>
             </div>
           </div>
         </div>
