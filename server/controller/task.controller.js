@@ -1,5 +1,6 @@
 import Task from "../models/task.model.js";
 import moment from "moment";
+import mongoose from "mongoose";
 import errorHandler from "../utils/error.js";
 
 export const createTask = async (req, res, next) => {
@@ -31,6 +32,18 @@ export const createTask = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     next(errorHandler(500, "Internal Server Error"));
+  }
+};
+
+export const getTaskById = async (req, res, next) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return next(errorHandler(404, "Task not found"));
+    }
+    res.status(200).json(task);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -160,6 +173,55 @@ export const updateTaskStatus = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+    next(errorHandler(500, "Internal Server Error"));
+  }
+};
+
+export const updateSubtaskCompletion = async (req, res, next) => {
+  const { taskId, subtaskId } = req.params;
+  const { completed } = req.body;
+
+  try {
+    if (
+      !mongoose.Types.ObjectId.isValid(taskId) ||
+      !mongoose.Types.ObjectId.isValid(subtaskId)
+    ) {
+      return next({ status: 400, message: "Invalid task or subtask ID" });
+    }
+
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return next({ status: 404, message: "Task not found" });
+    }
+
+    const subtask = task.checklist.find((sub) => sub._id == subtaskId);
+
+    if (!subtask) {
+      return next({ status: 404, message: "Subtask not found" });
+    }
+
+    if (typeof completed !== "boolean") {
+      return next(
+        errorHandler(400, "Invalid completion status. Expected boolean.")
+      );
+    }
+
+    if (completed === subtask.completed) {
+      return next(
+        errorHandler(409, "Subtask completion status is already " + completed)
+      );
+    }
+
+    subtask.completed = completed;
+    await task.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Subtask updated successfully",
+      updateSubTask: task,
+    });
+  } catch (err) {
     next(errorHandler(500, "Internal Server Error"));
   }
 };

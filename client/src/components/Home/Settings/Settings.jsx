@@ -3,7 +3,8 @@ import NavBar from "../Navbar/NavBar";
 import nameIcon from "../../../assets/name.png";
 import emailIcon from "../../../assets/email.png";
 import passwordIcon from "../../../assets/lock.png";
-import showIcon from "../../../assets/eye.png";
+import showEye from "../../../assets/eye.png";
+import hideEye from "../../../assets/hide-eye.png";
 import styles from "./Settings.module.css";
 import { updateUser, deleteUser } from "../../../utils/user";
 import { toast, ToastContainer } from "react-toastify";
@@ -22,8 +23,10 @@ const Settings = () => {
   });
 
   const userId = user._id;
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showOldPasswordIcon, setShowOldPasswordIcon] = useState(false);
+  const [showNewPasswordIcon, setShowNewPasswordIcon] = useState(false);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -48,12 +51,14 @@ const Settings = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const toggleOldPasswordVisibility = () => {
+    setShowOldPassword(!showOldPassword);
+    setShowOldPasswordIcon(!showOldPasswordIcon);
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+  const toggleNewPasswordVisibility = () => {
+    setShowNewPassword(!showNewPassword);
+    setShowNewPasswordIcon(!showNewPasswordIcon);
   };
 
   const handleUpdate = async (e) => {
@@ -143,7 +148,7 @@ const Settings = () => {
               className={styles.inputIcon}
             />
             <input
-              type={showPassword ? "text" : "password"}
+              type={showOldPassword ? "text" : "password"}
               name="oldPassword"
               placeholder="Old Password"
               value={formData.oldPassword}
@@ -151,12 +156,12 @@ const Settings = () => {
               className={styles.inputField}
             />
             <img
-              src={showIcon}
-              alt={showPassword ? "Hide Password" : "Show Password"}
+              src={showOldPasswordIcon ? hideEye : showEye}
+              alt={showOldPassword ? "Hide Password" : "Show Password"}
               className={`${styles.showIcon} ${
-                showPassword ? styles.active : ""
+                showOldPasswordIcon ? styles.active : ""
               }`}
-              onClick={togglePasswordVisibility}
+              onClick={toggleOldPasswordVisibility}
             />
           </div>
           <div className={styles.inputContainer}>
@@ -166,7 +171,7 @@ const Settings = () => {
               className={styles.inputIcon}
             />
             <input
-              type={showConfirmPassword ? "text" : "password"}
+              type={showNewPassword ? "text" : "password"}
               name="newPassword"
               placeholder="New Password"
               value={formData.newPassword}
@@ -174,16 +179,16 @@ const Settings = () => {
               className={styles.inputField}
             />
             <img
-              src={showIcon}
+              src={showNewPasswordIcon ? hideEye : showEye}
               alt={
-                showConfirmPassword
+                showNewPassword
                   ? "Hide Confirm Password"
                   : "Show Confirm Password"
               }
               className={`${styles.showIcon} ${
-                showConfirmPassword ? styles.active : ""
+                showNewPasswordIcon ? styles.active : ""
               }`}
-              onClick={toggleConfirmPasswordVisibility}
+              onClick={toggleNewPasswordVisibility}
             />
           </div>
           <button type="submit" className={styles.button}>

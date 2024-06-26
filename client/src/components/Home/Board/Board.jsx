@@ -9,11 +9,13 @@ import downArrow from "../../../assets/arrowDown.png";
 import moreIcon from "../../../assets/threeDot.png";
 import AddPeopleModal from "./AddPeopleModal";
 import CreateTaskModal from "./CreateTaskModal";
+import UpdateTaskModal from "./UpdateTaskModal";
 import {
   createTask,
   getAllTasks,
   deleteTask,
   updateTaskStatus,
+  updateTaskChecklist,
 } from "../../../utils/task";
 import styles from "./Board.module.css";
 
@@ -28,20 +30,8 @@ const Board = () => {
   const [visibleSubtasks, setVisibleSubtasks] = useState({});
   const [activeMenu, setActiveMenu] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
-
-  const handleMenuToggle = (taskId, event) => {
-    setActiveMenu(activeMenu === taskId ? null : taskId);
-    const rect = event.target.getBoundingClientRect();
-    setMenuPosition({
-      top: rect.top + window.scrollY,
-      left: rect.left + window.scrollX,
-    });
-  };
-
-  const handleMenuAction = (action, taskId) => {
-    console.log(action, taskId);
-    setActiveMenu(null);
-  };
+  const [showUpdateTaskModal, setShowUpdateTaskModal] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   useEffect(() => {
     if (location.state?.loggedIn) {
@@ -78,6 +68,30 @@ const Board = () => {
         theme: "light",
       });
     }
+  };
+
+  const handleMenuToggle = (taskId, event) => {
+    setActiveMenu(activeMenu === taskId ? null : taskId);
+    const rect = event.target.getBoundingClientRect();
+    setMenuPosition({
+      top: rect.top + window.scrollY,
+      left: rect.left + window.scrollX,
+    });
+  };
+
+  const handleMenuAction = (action, taskId) => {
+    if (action === "edit") {
+      setSelectedTaskId(taskId);
+      setShowUpdateTaskModal(true);
+    } else if (action === "delete") {
+      handleDeleteTask(taskId);
+    }
+    setActiveMenu(null);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setShowUpdateTaskModal(false);
+    setSelectedTaskId(null);
   };
 
   const toggleAddPeopleModal = () => {
@@ -211,14 +225,35 @@ const Board = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  const handleSubtaskToggle = (taskId, subtaskId) => {
-    console.log(`Toggled subtask ${subtaskId} for task ${taskId}`);
-  };
-
-  const handleStatusChange = async (taskId, newStatus) => {
+  const handleSubtaskToggle = async (taskId, subtaskId) => {
     try {
-      await updateTaskStatus(taskId, newStatus);
-      toast.success("Task status updated successfully", {
+      const task = tasks.find((t) => t._id === taskId);
+      const subtask = task.checklist.find((st) => st._id === subtaskId);
+      const newCompletionStatus = !subtask.completed;
+
+      const response = await updateTaskChecklist(taskId, subtaskId, {
+        completed: newCompletionStatus,
+      });
+
+      if (response.success) {
+        setTasks((prevTasks) =>
+          prevTasks.map((t) =>
+            t._id === taskId
+              ? {
+                  ...t,
+                  checklist: t.checklist.map((st) =>
+                    st._id === subtaskId
+                      ? { ...st, completed: newCompletionStatus }
+                      : st
+                  ),
+                }
+              : t
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating subtask:", error);
+      toast.error("Failed to update subtask", {
         position: "top-right",
         autoClose: 500,
         hideProgressBar: false,
@@ -227,6 +262,12 @@ const Board = () => {
         draggable: true,
         theme: "light",
       });
+    }
+  };
+
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      await updateTaskStatus(taskId, newStatus);
       fetchTasks();
     } catch (error) {
       toast.error("Failed to update task status", {
@@ -238,6 +279,29 @@ const Board = () => {
         draggable: true,
       });
     }
+  };
+
+  const handleUpdateSuccess = (message, isError = false) => {
+    if (isError) {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+    } else {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+    }
+    fetchTasks();
   };
 
   const renderTasks = (status) => {
@@ -331,10 +395,10 @@ const Board = () => {
             <div className={styles.taskFooter}>
               <span
                 className={`${styles.dueDate} ${
-                  task.status.toLowerCase() === "done"
-                    ? styles.doneDueDate
-                    : task.dueDate
-                    ? isPastDate(task.dueDate)
+                  task.dueDate
+                    ? task.status.toLowerCase() === "done"
+                      ? styles.doneDueDate
+                      : isPastDate(task.dueDate)
                       ? styles.pastDueDate
                       : ""
                     : styles.hidden
@@ -342,6 +406,7 @@ const Board = () => {
               >
                 {task.dueDate && formattedDueDate(task.dueDate)}
               </span>
+
               <div className={styles.statusContainer}>
                 {otherStatuses.map((statusOption) => (
                   <span
@@ -445,6 +510,15 @@ const Board = () => {
         onSave={handleSaveTask}
         addedEmails={addedEmails}
       />
+      {showUpdateTaskModal && selectedTaskId && (
+        <UpdateTaskModal
+          isOpen={showUpdateTaskModal}
+          onClose={handleCloseUpdateModal}
+          taskId={selectedTaskId}
+          addedEmails={addedEmails}
+          onUpdateSuccess={handleUpdateSuccess}
+        />
+      )}
     </>
   );
 };

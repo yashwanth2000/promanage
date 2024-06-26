@@ -4,7 +4,8 @@ import styles from "./Register.module.css";
 import nameIcon from "../../assets/name.png";
 import emailIcon from "../../assets/email.png";
 import passwordIcon from "../../assets/lock.png";
-import showIcon from "../../assets/eye.png";
+import showEye from "../../assets/eye.png";
+import hideEye from "../../assets/hide-eye.png";
 import { register } from "../../utils/auth";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -17,7 +18,9 @@ const Register = () => {
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordIcon, setShowPasswordIcon] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPasswordIcon, setShowConfirmPasswordIcon] = useState(false);
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -48,10 +51,12 @@ const Register = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+    setShowPasswordIcon(!showPasswordIcon);
   };
 
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
+    setShowConfirmPasswordIcon(!showConfirmPasswordIcon);
   };
 
   const handleSubmit = async (e) => {
@@ -138,7 +143,7 @@ const Register = () => {
             className={styles.inputField}
           />
           <img
-            src={showIcon}
+            src={showPassword ? hideEye : showEye}
             alt={showPassword ? "Hide Password" : "Show Password"}
             className={`${styles.showIcon} ${
               showPassword ? styles.active : ""
@@ -162,7 +167,7 @@ const Register = () => {
             className={styles.inputField}
           />
           <img
-            src={showIcon}
+            src={showConfirmPassword ? hideEye : showEye}
             alt={
               showConfirmPassword
                 ? "Hide Confirm Password"

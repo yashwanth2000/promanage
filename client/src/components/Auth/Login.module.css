@@ -1,4 +1,4 @@
-.registerContainer {
+.loginContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
   font-family: "Open Sans", sans-serif;
 }
 
-.registerContainer h2 {
+.loginContainer h2 {
   font-size: 2rem;
   text-align: center;
   font-weight: 600;
@@ -91,7 +91,7 @@
   font-weight: 400;
 }
 
-.loginLink {
+.registerLink {
   padding: 0.8rem;
   background-color: #fff;
   color: #17a2b8;

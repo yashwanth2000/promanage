@@ -30,6 +30,15 @@ export const createTask = async (data) => {
   }
 };
 
+export const getTaskById = async (taskId) => {
+  try {
+    const response = await axiosInstance.get(`/api/task/getTaskById/${taskId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching task:", error);
+    throw error;
+  }
+};
 export const getAllTasks = async (filter = "week") => {
   try {
     const response = await axiosInstance.get(
@@ -63,6 +72,32 @@ export const updateTaskStatus = async (taskId, status) => {
     return response.data;
   } catch (error) {
     console.error("Error updating task status:", error);
+    throw error;
+  }
+};
+
+export const updateTask = async (taskId, data) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/task/updateTask/${taskId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating task:", error);
+    throw error;
+  }
+};
+
+export const updateTaskChecklist = async (taskId, subTaskId, completed) => {
+  try {
+    const response = await axiosInstance.put(
+      `/api/task/${taskId}/subtasks/${subTaskId}`,
+      completed
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating task checklist:", error);
     throw error;
   }
 };

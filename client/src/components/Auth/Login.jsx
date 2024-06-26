@@ -3,7 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Login.module.css";
 import emailIcon from "../../assets/email.png";
 import passwordIcon from "../../assets/lock.png";
-import showIcon from "../../assets/eye.png";
+import showEye from "../../assets/eye.png";
+import hideEye from "../../assets/hide-eye.png";
 import { login } from "../../utils/auth";
 import Cookies from "js-cookie";
 import { toast, ToastContainer } from "react-toastify";
@@ -14,6 +15,7 @@ const Login = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordIcon, setShowPasswordIcon] = useState(false);
   const [errors, setErrors] = useState({
     email: "",
     password: "",
@@ -71,6 +73,7 @@ const Login = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+    setShowPasswordIcon(!showPasswordIcon);
   };
 
   const handleSubmit = async (e) => {
@@ -110,7 +113,7 @@ const Login = () => {
   };
 
   return (
-    <div className={styles.registerContainer}>
+    <div className={styles.loginContainer}>
       <h2>Login</h2>
       <form onSubmit={handleSubmit} className={styles.registerForm}>
         <div className={styles.inputContainer}>
@@ -140,7 +143,7 @@ const Login = () => {
             className={styles.inputField}
           />
           <img
-            src={showIcon}
+            src={showPasswordIcon ? hideEye : showEye}
             alt={showPassword ? "Hide Password" : "Show Password"}
             className={`${styles.showIcon} ${
               showPassword ? styles.active : ""
@@ -155,7 +158,7 @@ const Login = () => {
         </button>
       </form>
       <p className={styles.registerText}>Have no account yet?</p>
-      <Link to="/register" className={styles.loginLink}>
+      <Link to="/register" className={styles.registerLink}>
         Register
       </Link>
       <ToastContainer />
