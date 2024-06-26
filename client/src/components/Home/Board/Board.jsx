@@ -1,4 +1,4 @@
-import { useState, useEffect ,} from "react";
+import { useState, useEffect } from "react";
 import NavBar from "../Navbar/NavBar";
 import { useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,7 +9,12 @@ import downArrow from "../../../assets/arrowDown.png";
 import moreIcon from "../../../assets/threeDot.png";
 import AddPeopleModal from "./AddPeopleModal";
 import CreateTaskModal from "./CreateTaskModal";
-import { createTask, getAllTasks, deleteTask } from "../../../utils/task";
+import {
+  createTask,
+  getAllTasks,
+  deleteTask,
+  updateTaskStatus,
+} from "../../../utils/task";
 import styles from "./Board.module.css";
 
 const Board = () => {
@@ -63,7 +68,15 @@ const Board = () => {
       setTasks(response.tasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      toast.error("Failed to fetch tasks");
+      toast.error("Failed to fetch tasks", {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
     }
   };
 
@@ -202,122 +215,152 @@ const Board = () => {
     console.log(`Toggled subtask ${subtaskId} for task ${taskId}`);
   };
 
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      await updateTaskStatus(taskId, newStatus);
+      toast.success("Task status updated successfully", {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      fetchTasks();
+    } catch (error) {
+      toast.error("Failed to update task status", {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+    }
+  };
+
   const renderTasks = (status) => {
+    const statusOptions = ["Backlog", "To do", "In Progress", "Done"];
+
     return tasks
       .filter((task) => task.status.toLowerCase() === status.toLowerCase())
-      .map((task) => (
-        <div key={task._id} className={styles.taskCard}>
-          <div className={styles.taskHeader}>
-            <div className={styles.priorityContainer}>
-              <div
-                className={`${styles.priorityIndicator} ${
-                  styles[task.priority.toLowerCase()]
-                }`}
+      .map((task) => {
+        const otherStatuses = statusOptions.filter(
+          (s) => s.toLowerCase() !== task.status.toLowerCase()
+        );
+
+        return (
+          <div key={task._id} className={styles.taskCard}>
+            <div className={styles.taskHeader}>
+              <div className={styles.priorityContainer}>
+                <div
+                  className={`${styles.priorityIndicator} ${
+                    styles[task.priority.toLowerCase()]
+                  }`}
+                />
+                <p className={styles.priorityLabel}>
+                  {getPriorityLabel(task.priority)}
+                </p>
+                {task.assignedTo && (
+                  <div className={styles.assigneeAvatar}>
+                    {getInitials(task.assignedTo)}
+                  </div>
+                )}
+              </div>
+              <img
+                src={moreIcon}
+                alt="More"
+                className={styles.moreIcon}
+                onClick={(e) => handleMenuToggle(task._id, e)}
               />
-              <p className={styles.priorityLabel}>
-                {getPriorityLabel(task.priority)}
-              </p>
-              {task.assignedTo && (
-                <div className={styles.assigneeAvatar}>
-                  {getInitials(task.assignedTo)}
+              {activeMenu === task._id && (
+                <div
+                  className={styles.taskMenu}
+                  style={{
+                    top: menuPosition.top + 24,
+                    left: menuPosition.left,
+                  }}
+                >
+                  <p onClick={() => handleMenuAction("edit", task._id)}>Edit</p>
+                  <p onClick={() => handleMenuAction("share", task._id)}>
+                    Share
+                  </p>
+                  <p
+                    onClick={() => handleDeleteTask(task._id)}
+                    className={styles.delete}
+                  >
+                    Delete
+                  </p>
                 </div>
               )}
             </div>
-            <img
-              src={moreIcon}
-              alt="More"
-              className={styles.moreIcon}
-              onClick={(e) => handleMenuToggle(task._id, e)}
-            />
-            {activeMenu === task._id && (
-              <div
-                className={styles.taskMenu}
-                style={{ top: menuPosition.top + 24, left: menuPosition.left }}
-              >
-                <p onClick={() => handleMenuAction("edit", task._id)}>Edit</p>
-                <p onClick={() => handleMenuAction("share", task._id)}>Share</p>
-                <p
-                  onClick={() => handleDeleteTask(task._id)}
-                  className={styles.delete}
-                >
-                  Delete
+            <h4>{task.title}</h4>
+            <div className={styles.taskChecklistContainer}>
+              <div className={styles.taskChecklist}>
+                <p>
+                  Checklist (
+                  {task.checklist.filter((item) => item.completed).length}/
+                  {task.checklist.length})
                 </p>
+                <img
+                  src={downArrow}
+                  alt="Down Arrow"
+                  className={`${styles.downArrow} ${
+                    visibleSubtasks[task._id] ? styles.rotated : ""
+                  }`}
+                  onClick={() => handleShowSubTasks(task._id)}
+                />
               </div>
-            )}
-          </div>
-          <h4>{task.title}</h4>
-          <div className={styles.taskChecklistContainer}>
-            <div className={styles.taskChecklist}>
-              <p>
-                Checklist (
-                {task.checklist.filter((item) => item.completed).length}/
-                {task.checklist.length})
-              </p>
-              <img
-                src={downArrow}
-                alt="Down Arrow"
-                className={`${styles.downArrow} ${
-                  visibleSubtasks[task._id] ? styles.rotated : ""
-                }`}
-                onClick={() => handleShowSubTasks(task._id)}
-              />
+              {visibleSubtasks[task._id] && (
+                <div className={styles.subtaskList}>
+                  {task.checklist.map((item) => (
+                    <div key={item._id} className={styles.subtaskItem}>
+                      <input
+                        type="checkbox"
+                        checked={item.completed}
+                        onChange={() => handleSubtaskToggle(task._id, item._id)}
+                        className={styles.subtaskCheckbox}
+                      />
+                      <span className={styles.subtaskText}>{item.task}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {visibleSubtasks[task._id] && (
-              <div className={styles.subtaskList}>
-                {task.checklist.map((item) => (
-                  <div key={item._id} className={styles.subtaskItem}>
-                    <input
-                      type="checkbox"
-                      checked={item.completed}
-                      onChange={() => handleSubtaskToggle(task._id, item._id)}
-                      className={styles.subtaskCheckbox}
-                    />
-                    <span className={styles.subtaskText}>{item.task}</span>
-                  </div>
+            <div className={styles.taskFooter}>
+              <span
+                className={`${styles.dueDate} ${
+                  task.status.toLowerCase() === "done"
+                    ? styles.doneDueDate
+                    : task.dueDate
+                    ? isPastDate(task.dueDate)
+                      ? styles.pastDueDate
+                      : ""
+                    : styles.hidden
+                }`}
+              >
+                {task.dueDate && formattedDueDate(task.dueDate)}
+              </span>
+              <div className={styles.statusContainer}>
+                {otherStatuses.map((statusOption) => (
+                  <span
+                    key={statusOption}
+                    className={
+                      statusOption.toLowerCase() === task.status.toLowerCase()
+                        ? styles.activeStatus
+                        : ""
+                    }
+                    onClick={() => handleStatusChange(task._id, statusOption)}
+                  >
+                    {statusOption.toUpperCase()}
+                  </span>
                 ))}
               </div>
-            )}
-          </div>
-          <div className={styles.taskFooter}>
-            <span
-              className={`${styles.dueDate} ${
-                task.dueDate
-                  ? isPastDate(task.dueDate)
-                    ? styles.pastDueDate
-                    : ""
-                  : styles.hidden
-              }`}
-            >
-              {task.dueDate && formattedDueDate(task.dueDate)}
-            </span>
-            <div className={styles.statusContainer}>
-              <span
-                className={
-                  status.toLowerCase() === "backlog" ? styles.activeStatus : ""
-                }
-              >
-                BACKLOG
-              </span>
-              <span
-                className={
-                  status.toLowerCase() === "in progress"
-                    ? styles.activeStatus
-                    : ""
-                }
-              >
-                PROGRESS
-              </span>
-              <span
-                className={
-                  status.toLowerCase() === "done" ? styles.activeStatus : ""
-                }
-              >
-                DONE
-              </span>
             </div>
           </div>
-        </div>
-      ));
+        );
+      });
   };
 
   return (
@@ -379,7 +422,7 @@ const Board = () => {
                 <h3>In Progress</h3>
                 <img src={collapseAllIcon} alt="Collapse All" />
               </div>
-              {renderTasks("In progress")}
+              {renderTasks("In Progress")}
             </div>
             <div className={styles.column}>
               <div className={styles.taskHeader}>

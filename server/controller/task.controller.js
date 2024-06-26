@@ -97,3 +97,69 @@ export const deleteTask = async (req, res, next) => {
     next(errorHandler(500, "Internal Server Error"));
   }
 };
+
+export const updateTask = async (req, res, next) => {
+  try {
+    const { title, priority, assignedTo, checklist, status, dueDate } =
+      req.body;
+
+    const currentTask = await Task.findById(req.params.id);
+
+    if (!currentTask) {
+      return next(errorHandler(404, "Task not found"));
+    }
+
+    if (
+      title === currentTask.title &&
+      priority === currentTask.priority &&
+      assignedTo === currentTask.assignedTo &&
+      JSON.stringify(checklist) === JSON.stringify(currentTask.checklist) &&
+      status === currentTask.status &&
+      dueDate === currentTask.dueDate
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "No changes detected. Task data is the same.",
+      });
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      { title, priority, assignedTo, checklist, status, dueDate },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      updatedTask: updatedTask,
+      message: "Task updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, "Internal Server Error"));
+  }
+};
+
+export const updateTaskStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!task) {
+      return next(errorHandler(404, "Task not found"));
+    }
+
+    res.status(200).json({
+      success: true,
+      updatedTaskStatus: status,
+      message: "Task status updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    next(errorHandler(500, "Internal Server Error"));
+  }
+};

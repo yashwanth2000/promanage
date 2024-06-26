@@ -53,3 +53,16 @@ export const deleteTask = async (taskId) => {
     throw error;
   }
 };
+
+export const updateTaskStatus = async (taskId, status) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/api/task/updateTaskStatus/${taskId}`,
+      { status }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating task status:", error);
+    throw error;
+  }
+};

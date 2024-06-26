@@ -313,6 +313,11 @@
   color: #fff;
 }
 
+.doneDueDate {
+  background-color: #63c05b;
+  color: white;
+}
+
 .hidden {
   display: none;
 }
