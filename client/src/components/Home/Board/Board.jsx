@@ -18,6 +18,7 @@ import {
   updateTaskChecklist,
 } from "../../../utils/task";
 import copy from "copy-to-clipboard";
+import { Tooltip } from "react-tooltip";
 import styles from "./Board.module.css";
 
 const Board = () => {
@@ -29,11 +30,11 @@ const Board = () => {
   const [addedEmails, setAddedEmails] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [timeFilter, setTimeFilter] = useState("week");
-  const [visibleSubtasks, setVisibleSubtasks] = useState({});
   const [activeMenu, setActiveMenu] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [showUpdateTaskModal, setShowUpdateTaskModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [expandedTasks, setExpandedTasks] = useState({});
 
   useEffect(() => {
     if (location.state?.loggedIn) {
@@ -166,10 +167,21 @@ const Board = () => {
   };
 
   const handleShowSubTasks = (taskId) => {
-    setVisibleSubtasks((prevState) => ({
+    setExpandedTasks((prevState) => ({
       ...prevState,
       [taskId]: !prevState[taskId],
     }));
+  };
+
+  const handleCollapseAll = (status) => {
+    const tasksInColumn = tasks.filter(
+      (task) => task.status.toLowerCase() === status.toLowerCase()
+    );
+    const updatedExpandedTasks = { ...expandedTasks };
+    tasksInColumn.forEach((task) => {
+      updatedExpandedTasks[task._id] = false;
+    });
+    setExpandedTasks(updatedExpandedTasks);
   };
 
   const options = { day: "2-digit", month: "short", year: "numeric" };
@@ -343,125 +355,155 @@ const Board = () => {
   const renderTasks = (status) => {
     const statusOptions = ["Backlog", "To do", "In Progress", "Done"];
 
-    return tasks
-      .filter((task) => task.status.toLowerCase() === status.toLowerCase())
-      .map((task) => {
-        const otherStatuses = statusOptions.filter(
-          (s) => s.toLowerCase() !== task.status.toLowerCase()
-        );
+    return (
+      <div className={styles.columnContent}>
+        {tasks
+          .filter((task) => task.status.toLowerCase() === status.toLowerCase())
+          .map((task) => {
+            const otherStatuses = statusOptions.filter(
+              (s) => s.toLowerCase() !== task.status.toLowerCase()
+            );
 
-        return (
-          <div key={task._id} className={styles.taskCard}>
-            <div className={styles.taskHeader}>
-              <div className={styles.priorityContainer}>
-                <div
-                  className={`${styles.priorityIndicator} ${
-                    styles[task.priority.toLowerCase()]
-                  }`}
-                />
-                <p className={styles.priorityLabel}>
-                  {getPriorityLabel(task.priority)}
-                </p>
-                {task.assignedTo && (
-                  <div className={styles.assigneeAvatar}>
-                    {getInitials(task.assignedTo)}
+            const truncatedTitle =
+              task.title.split(" ").slice(0, 3).join(" ") +
+              (task.title.split(" ").length > 3 ? " ..." : "");
+
+            return (
+              <div key={task._id} className={styles.taskCard}>
+                <div className={styles.taskHeader}>
+                  <div className={styles.priorityContainer}>
+                    <div
+                      className={`${styles.priorityIndicator} ${
+                        styles[task.priority.toLowerCase()]
+                      }`}
+                    />
+                    <p className={styles.priorityLabel}>
+                      {getPriorityLabel(task.priority)}
+                    </p>
+                    {task.assignedTo && (
+                      <div
+                        className={styles.assigneeAvatar}
+                        data-tooltip-id={`assignee-${task._id}`}
+                        data-tooltip-content={task.assignedTo}
+                      >
+                        {getInitials(task.assignedTo)}
+                      </div>
+                    )}
+                    <Tooltip id={`assignee-${task._id}`} />
                   </div>
-                )}
-              </div>
-              <img
-                src={moreIcon}
-                alt="More"
-                className={styles.moreIcon}
-                onClick={(e) => handleMenuToggle(task._id, e)}
-              />
-              {activeMenu === task._id && (
-                <div
-                  className={styles.taskMenu}
-                  style={{
-                    top: menuPosition.top + 10,
-                    left: menuPosition.left - 80,
-                  }}
-                >
-                  <p onClick={() => handleMenuAction("edit", task._id)}>Edit</p>
-                  <p onClick={() => handleShareClick(task._id)}>Share</p>
-                  <p
-                    onClick={() => handleDeleteTask(task._id)}
-                    className={styles.delete}
-                  >
-                    Delete
-                  </p>
-                </div>
-              )}
-            </div>
-            <h4>{task.title}</h4>
-            <div className={styles.taskChecklistContainer}>
-              <div className={styles.taskChecklist}>
-                <p>
-                  Checklist (
-                  {task.checklist.filter((item) => item.completed).length}/
-                  {task.checklist.length})
-                </p>
-                <img
-                  src={downArrow}
-                  alt="Down Arrow"
-                  className={`${styles.downArrow} ${
-                    visibleSubtasks[task._id] ? styles.rotated : ""
-                  }`}
-                  onClick={() => handleShowSubTasks(task._id)}
-                />
-              </div>
-              {visibleSubtasks[task._id] && (
-                <div className={styles.subtaskList}>
-                  {task.checklist.map((item) => (
-                    <div key={item._id} className={styles.subtaskItem}>
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={() => handleSubtaskToggle(task._id, item._id)}
-                        className={styles.subtaskCheckbox}
-                      />
-                      <span className={styles.subtaskText}>{item.task}</span>
+                  <img
+                    src={moreIcon}
+                    alt="More"
+                    className={styles.moreIcon}
+                    onClick={(e) => handleMenuToggle(task._id, e)}
+                  />
+                  {activeMenu === task._id && (
+                    <div
+                      className={styles.taskMenu}
+                      style={{
+                        top: menuPosition.top + 10,
+                        left: menuPosition.left - 80,
+                      }}
+                    >
+                      <p onClick={() => handleMenuAction("edit", task._id)}>
+                        Edit
+                      </p>
+                      <p onClick={() => handleShareClick(task._id)}>Share</p>
+                      <p
+                        onClick={() => handleDeleteTask(task._id)}
+                        className={styles.delete}
+                      >
+                        Delete
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
-            <div className={styles.taskFooter}>
-              <span
-                className={`${styles.dueDate} ${
-                  task.dueDate
-                    ? task.status.toLowerCase() === "done"
-                      ? styles.doneDueDate
-                      : isPastDate(task.dueDate)
-                      ? styles.pastDueDate
-                      : ""
-                    : styles.hidden
-                }`}
-              >
-                {task.dueDate && formattedDueDate(task.dueDate)}
-              </span>
-
-              <div className={styles.statusContainer}>
-                {otherStatuses.map((statusOption) => (
+                <h4
+                  className={styles.taskTitle}
+                  data-tooltip-id={`title-${task._id}`}
+                  data-tooltip-content={task.title}
+                >
+                  {truncatedTitle}
+                </h4>
+                <Tooltip id={`title-${task._id}`} />
+                <div className={styles.taskChecklistContainer}>
+                  <div className={styles.taskChecklist}>
+                    <p>
+                      Checklist (
+                      {task.checklist.filter((item) => item.completed).length}/
+                      {task.checklist.length})
+                    </p>
+                    <img
+                      src={downArrow}
+                      alt="Down Arrow"
+                      className={`${styles.downArrow} ${
+                        expandedTasks[task._id] ? styles.rotated : ""
+                      }`}
+                      onClick={() => handleShowSubTasks(task._id)}
+                    />
+                  </div>
+                  {expandedTasks[task._id] && (
+                    <div className={styles.subtaskList}>
+                      {task.checklist.map((item) => (
+                        <div key={item._id} className={styles.subtaskItem}>
+                          <input
+                            type="checkbox"
+                            checked={item.completed}
+                            onChange={() =>
+                              handleSubtaskToggle(task._id, item._id)
+                            }
+                            className={styles.subtaskCheckbox}
+                          />
+                          <span className={styles.subtaskText}>
+                            {item.task}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className={styles.taskFooter}>
                   <span
-                    key={statusOption}
-                    className={
-                      statusOption.toLowerCase() === task.status.toLowerCase()
-                        ? styles.activeStatus
-                        : ""
-                    }
-                    onClick={() => handleStatusChange(task._id, statusOption)}
+                    className={`${styles.dueDate} ${
+                      task.dueDate
+                        ? task.status.toLowerCase() === "done"
+                          ? styles.doneDueDate
+                          : isPastDate(task.dueDate)
+                          ? styles.pastDueDate
+                          : ""
+                        : styles.hidden
+                    }`}
                   >
-                    {statusOption.toUpperCase()}
+                    {task.dueDate && formattedDueDate(task.dueDate)}
                   </span>
-                ))}
+
+                  <div className={styles.statusContainer}>
+                    {otherStatuses.map((statusOption) => (
+                      <span
+                        key={statusOption}
+                        className={
+                          statusOption.toLowerCase() ===
+                          task.status.toLowerCase()
+                            ? styles.activeStatus
+                            : ""
+                        }
+                        onClick={() =>
+                          handleStatusChange(task._id, statusOption)
+                        }
+                      >
+                        {statusOption.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        );
-      });
+            );
+          })}
+      </div>
+    );
   };
 
+  // Main return statement
   return (
     <>
       <NavBar />
@@ -494,42 +536,30 @@ const Board = () => {
             </select>
           </div>
           <div className={styles.columns}>
-            <div className={styles.column}>
-              <div className={styles.taskHeader}>
-                <h3>Backlog</h3>
-                <img src={collapseAllIcon} alt="Collapse All" />
-              </div>
-              {renderTasks("Backlog")}
-            </div>
-            <div className={styles.column}>
-              <div className={styles.taskHeader}>
-                <h3>To do</h3>
-                <div>
-                  <img
-                    src={plusIcon}
-                    alt="Plus"
-                    className={styles.plusIcon}
-                    onClick={handleOpenCreateTaskModal}
-                  />
-                  <img src={collapseAllIcon} alt="Collapse All" />
+            {["Backlog", "To do", "In Progress", "Done"].map((status) => (
+              <div key={status} className={styles.column}>
+                <div className={styles.taskHeader}>
+                  <h3>{status}</h3>
+                  <div>
+                    {status === "To do" && (
+                      <img
+                        src={plusIcon}
+                        alt="Plus"
+                        className={styles.plusIcon}
+                        onClick={handleOpenCreateTaskModal}
+                      />
+                    )}
+                    <img
+                      src={collapseAllIcon}
+                      alt="Collapse All"
+                      className={styles.collapseAllIcon}
+                      onClick={() => handleCollapseAll(status)}
+                    />
+                  </div>
                 </div>
+                {renderTasks(status)}
               </div>
-              {renderTasks("To do")}
-            </div>
-            <div className={styles.column}>
-              <div className={styles.taskHeader}>
-                <h3>In Progress</h3>
-                <img src={collapseAllIcon} alt="Collapse All" />
-              </div>
-              {renderTasks("In Progress")}
-            </div>
-            <div className={styles.column}>
-              <div className={styles.taskHeader}>
-                <h3>Done</h3>
-                <img src={collapseAllIcon} alt="Collapse All" />
-              </div>
-              {renderTasks("Done")}
-            </div>
+            ))}
           </div>
         </main>
       </div>

@@ -25,11 +25,10 @@
 }
 
 .shareTaskContainer {
-  flex: 1;
+  flex: 0.5;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
 }
 
 .content {
@@ -38,7 +37,7 @@
   padding: 1.5rem;
   max-width: 500px;
   width: 100%;
-  height: 446px;
+  height: auto;
 }
 
 .priorityContainer {
@@ -84,17 +83,19 @@
   margin-left: 10px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
+  cursor: pointer;
 }
 
 .taskTitle {
   font-family: "Poppins", sans-serif;
   font-size: 18px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .taskChecklistContainer {
-  margin-top: 20px;
-  margin-bottom: 30px;
+  max-height: 350px;
+  overflow-y: auto;
 }
 
 .taskChecklistContainer p {
@@ -112,6 +113,7 @@
   border-radius: 12px;
   background-color: #ffffff;
   padding: 8px;
+  margin-right: 20px;
 }
 
 .subtaskCheckbox {
@@ -162,4 +164,53 @@
   font-size: 12px;
   font-weight: 500;
   margin-left: 10px;
+}
+
+@media screen and (max-width: 600px) {
+  .title {
+    font-size: 1rem;
+  }
+
+  .content {
+    height: auto;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  .taskTitle {
+    font-size: 16px;
+  }
+
+  .subtaskItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .subtaskCheckbox {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .content {
+    padding: 1rem;
+  }
+
+  .taskChecklistContainer p {
+    font-size: 12px;
+  }
+
+  .subtaskText {
+    font-size: 12px;
+  }
+
+  .dueDate {
+    font-size: 12px;
+  }
+
+  .dueDate span {
+    padding: 0.2rem 0.4rem;
+    font-size: 10px;
+  }
 }

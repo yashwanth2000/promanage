@@ -65,6 +65,14 @@
   cursor: pointer;
 }
 
+.collapseAllIcon {
+  opacity: 0.5;
+}
+
+.collapseAllIcon:hover {
+  opacity: 1;
+}
+
 .timeFilter {
   padding: 5px 10px;
   border: none;
@@ -101,6 +109,10 @@
   padding: 20px;
   border-radius: 10px;
   min-height: 530px;
+}
+
+.columnContent {
+  flex-grow: 1;
 }
 
 .column h3 {
@@ -191,6 +203,7 @@
   margin-left: 10px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
+  cursor: pointer;
 }
 
 .moreIcon {
@@ -229,6 +242,10 @@
   font-family: "Poppins", sans-serif;
   font-size: 18px;
   font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .taskChecklistContainer {
@@ -269,6 +286,7 @@
   border-radius: 12px;
   background-color: #ffffff;
   padding: 8px;
+  margin-top: 10px;
 }
 
 .subtaskCheckbox {
