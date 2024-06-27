@@ -17,10 +17,12 @@ import {
   updateTaskStatus,
   updateTaskChecklist,
 } from "../../../utils/task";
+import copy from "copy-to-clipboard";
 import styles from "./Board.module.css";
 
 const Board = () => {
   const location = useLocation();
+
   const user = JSON.parse(localStorage.getItem("user"));
   const [showAddPeopleModal, setShowAddPeopleModal] = useState(false);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
@@ -225,6 +227,40 @@ const Board = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
+  const handleShareClick = (taskId) => {
+    const url = import.meta.env.VITE_SHARE_URL + `/share/${taskId}`;
+
+    try {
+      const success = copy(url);
+      if (success) {
+        toast.success("Link copied to clipboard", {
+          position: "top-right",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+      } else {
+        toast.error("Failed to copy. Please try again.", {
+          position: "top-right",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to copy to clipboard:", error);
+      toast.error("An error occurred. Please try again.");
+    }
+
+    setActiveMenu(null);
+  };
+
   const handleSubtaskToggle = async (taskId, subtaskId) => {
     try {
       const task = tasks.find((t) => t._id === taskId);
@@ -342,14 +378,12 @@ const Board = () => {
                 <div
                   className={styles.taskMenu}
                   style={{
-                    top: menuPosition.top + 24,
-                    left: menuPosition.left,
+                    top: menuPosition.top + 10,
+                    left: menuPosition.left - 80,
                   }}
                 >
                   <p onClick={() => handleMenuAction("edit", task._id)}>Edit</p>
-                  <p onClick={() => handleMenuAction("share", task._id)}>
-                    Share
-                  </p>
+                  <p onClick={() => handleShareClick(task._id)}>Share</p>
                   <p
                     onClick={() => handleDeleteTask(task._id)}
                     className={styles.delete}

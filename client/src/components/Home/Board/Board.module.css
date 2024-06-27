@@ -200,8 +200,10 @@
 .taskMenu {
   position: absolute;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  box-shadow: 0px 2px 22px 0px #7e7a7a40;
+  width: 100px;
+  height: 120px;
+  border-radius: 12px;
   z-index: 1;
 }
 
@@ -257,10 +259,6 @@
 
 .downArrow.rotated {
   transform: rotate(180deg);
-}
-
-.subtaskList {
-  margin-top: 10px;
 }
 
 .subtaskItem {

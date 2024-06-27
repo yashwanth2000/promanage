@@ -1,0 +1,165 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+}
+
+.logoIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.title {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #474444;
+  letter-spacing: 0.125rem;
+}
+
+.shareTaskContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.content {
+  border: 2px solid #edf5fe;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 100%;
+  height: 446px;
+}
+
+.priorityContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.priorityIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.priorityLabel {
+  font-family: "Poppins", sans-serif;
+  color: #707070;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.low {
+  background-color: #63c05b;
+}
+.moderate {
+  background-color: #18b0ff;
+}
+.high {
+  background-color: #ff2473;
+}
+
+.assigneeAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #ffebeb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #000;
+  margin-left: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 400;
+}
+
+.taskTitle {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.taskChecklistContainer {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.taskChecklistContainer p {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 20px 0;
+}
+
+.subtaskItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  background-color: #ffffff;
+  padding: 8px;
+}
+
+.subtaskCheckbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  margin-right: 12px;
+  position: relative;
+  cursor: pointer;
+}
+
+.subtaskCheckbox:checked {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.subtaskCheckbox:checked::after {
+  content: "\2714";
+  font-size: 14px;
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.subtaskText {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.dueDate {
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dueDate span {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background-color: #cf3636;
+  color: white;
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 10px;
+}

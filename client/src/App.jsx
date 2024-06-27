@@ -6,6 +6,7 @@ import Board from "./components/Home/Board/Board";
 import Analytics from "./components/Home/Analytics/Analytics";
 import Settings from "./components/Home/Settings/Settings";
 import PrivateRoute from "./utils/PrivateRoute";
+import ShareTask from "./components/Home/Board/ShareTask";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
+        <Route path="/share/:id" element={<ShareTask />} />
       </Routes>
     </BrowserRouter>
   );
