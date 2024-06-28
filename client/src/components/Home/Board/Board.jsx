@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import NavBar from "../Navbar/NavBar";
 import { useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -24,6 +24,7 @@ import DeleteTaskModal from "./DeleteTaskModal.jsx";
 
 const Board = () => {
   const location = useLocation();
+  const menuRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const [showAddPeopleModal, setShowAddPeopleModal] = useState(false);
@@ -58,6 +59,19 @@ const Board = () => {
     fetchTasks();
   }, [location.state, timeFilter]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setActiveMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fetchTasks = async () => {
     try {
       const response = await getAllTasks(timeFilter);
@@ -77,6 +91,7 @@ const Board = () => {
   };
 
   const handleMenuToggle = (taskId, event) => {
+    event.stopPropagation();
     setActiveMenu(activeMenu === taskId ? null : taskId);
     const rect = event.target.getBoundingClientRect();
     setMenuPosition({
@@ -111,9 +126,13 @@ const Board = () => {
   };
 
   const handleAddPeople = (email) => {
-    const updatedEmails = [...addedEmails, email];
-    setAddedEmails(updatedEmails);
-    localStorage.setItem("addedEmails", JSON.stringify(updatedEmails));
+    const lowerCaseEmail = email.toLowerCase();
+
+    if (!addedEmails.includes(lowerCaseEmail)) {
+      const updatedEmails = [...addedEmails, lowerCaseEmail];
+      setAddedEmails(updatedEmails);
+      localStorage.setItem("addedEmails", JSON.stringify(updatedEmails));
+    }
   };
 
   const handleSaveTask = async (taskData) => {
@@ -404,6 +423,7 @@ const Board = () => {
                   />
                   {activeMenu === task._id && (
                     <div
+                      ref={menuRef}
                       className={styles.taskMenu}
                       style={{
                         top: menuPosition.top + 10,
@@ -540,31 +560,33 @@ const Board = () => {
               <option value="month">This month</option>
             </select>
           </div>
-          <div className={styles.columns}>
-            {["Backlog", "To do", "In Progress", "Done"].map((status) => (
-              <div key={status} className={styles.column}>
-                <div className={styles.taskHeader}>
-                  <h3>{status}</h3>
-                  <div>
-                    {status === "To do" && (
+          <div className={styles.columnsWrapper}>
+            <div className={styles.columns}>
+              {["Backlog", "To do", "In Progress", "Done"].map((status) => (
+                <div key={status} className={styles.column}>
+                  <div className={styles.taskHeader}>
+                    <h3>{status}</h3>
+                    <div>
+                      {status === "To do" && (
+                        <img
+                          src={plusIcon}
+                          alt="Plus"
+                          className={styles.plusIcon}
+                          onClick={handleOpenCreateTaskModal}
+                        />
+                      )}
                       <img
-                        src={plusIcon}
-                        alt="Plus"
-                        className={styles.plusIcon}
-                        onClick={handleOpenCreateTaskModal}
+                        src={collapseAllIcon}
+                        alt="Collapse All"
+                        className={styles.collapseAllIcon}
+                        onClick={() => handleCollapseAll(status)}
                       />
-                    )}
-                    <img
-                      src={collapseAllIcon}
-                      alt="Collapse All"
-                      className={styles.collapseAllIcon}
-                      onClick={() => handleCollapseAll(status)}
-                    />
+                    </div>
                   </div>
+                  {renderTasks(status)}
                 </div>
-                {renderTasks(status)}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </main>
       </div>

@@ -2,16 +2,19 @@
   display: flex;
   flex-direction: column;
   padding: 1.25rem;
-  min-height: 100vh;
+  height: 100vh;
   width: calc(100% - 11.25rem);
   margin-left: 11.25rem;
   font-family: "Poppins", sans-serif;
+  overflow: hidden;
 }
 
 .mainContent {
   flex-grow: 1;
   padding: 5px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .header {
@@ -86,25 +89,29 @@
   padding: 5px;
   cursor: pointer;
   border-radius: 12px;
-  padding: 5px;
+}
+
+.columnsWrapper {
+  flex-grow: 1;
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: 20px;
 }
 
 .columns {
   display: flex;
-  gap: 20px;
+  height: 100%;
+  gap: 10px;
 }
 
 .column {
-  flex: 1;
-  min-width: 350px;
+  flex: 0 0 350px;
   background-color: #eef2f5;
   padding: 20px;
   border-radius: 10px;
-  min-height: 530px;
-}
-
-.columnContent {
-  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .column h3 {

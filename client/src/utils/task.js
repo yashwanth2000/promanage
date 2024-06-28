@@ -101,3 +101,13 @@ export const updateTaskChecklist = async (taskId, subTaskId, completed) => {
     throw error;
   }
 };
+
+export const getTaskStats = async () => {
+  try {
+    const response = await axiosInstance.get("/api/task/analytics");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching task stats:", error);
+    throw error;
+  }
+};

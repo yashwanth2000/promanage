@@ -8,6 +8,7 @@ import {
   updateTaskStatus,
   updateTask,
   updateSubtaskCompletion,
+  getTaskStats,
 } from "../controller/task.controller.js";
 import verifyToken from "../utils/verifyToken.js";
 
@@ -18,5 +19,6 @@ router.delete("/deleteTask/:id", verifyToken, deleteTask);
 router.patch("/updateTask/:id", verifyToken, updateTask);
 router.patch("/updateTaskStatus/:id", verifyToken, updateTaskStatus);
 router.put("/:taskId/subtasks/:subtaskId", updateSubtaskCompletion);
+router.get("/analytics", verifyToken, getTaskStats);
 
 export default router;

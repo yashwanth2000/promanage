@@ -229,3 +229,71 @@ export const updateSubtaskCompletion = async (req, res, next) => {
     next(errorHandler(500, "Internal Server Error"));
   }
 };
+
+export const getTaskStats = async (req, res) => {
+  try {
+    const tasks = await Task.find();
+
+    let backlogCount = 0;
+    let todoCount = 0;
+    let inProgressCount = 0;
+    let completedCount = 0;
+    let lowPriorityCount = 0;
+    let moderatePriorityCount = 0;
+    let highPriorityCount = 0;
+    let dueDateTasksCount = 0;
+
+    tasks.forEach((task) => {
+      switch (task.status) {
+        case "Backlog":
+          backlogCount++;
+          break;
+        case "To do":
+          todoCount++;
+          break;
+        case "In Progress":
+          inProgressCount++;
+          break;
+        case "Done":
+          completedCount++;
+          break;
+        default:
+          break;
+      }
+
+      switch (task.priority) {
+        case "low":
+          lowPriorityCount++;
+          break;
+        case "moderate":
+          moderatePriorityCount++;
+          break;
+        case "high":
+          highPriorityCount++;
+          break;
+        default:
+          break;
+      }
+
+      if (task.dueDate && new Date(task.dueDate) < new Date()) {
+        dueDateTasksCount++;
+      }
+    });
+
+    const taskStats = {
+      backlogTasks: backlogCount,
+      todoTasks: todoCount,
+      inProgressTasks: inProgressCount,
+      completedTasks: completedCount,
+      lowPriorityTasks: lowPriorityCount,
+      moderatePriorityTasks: moderatePriorityCount,
+      highPriorityTasks: highPriorityCount,
+      dueDateTasks: dueDateTasksCount,
+    };
+
+    res.status(200).json({ success: true, analytics: taskStats });
+  } catch (err) {
+    console.error("Error fetching tasks:", err);
+    next(errorHandler(500, "Internal Server Error"));
+  }
+};
