@@ -68,14 +68,13 @@
   background-color: #4391ed1a;
   width: 12rem;
   border-radius: 5px;
-} 
+}
 
 .icon {
   width: 1rem;
   height: 1rem;
   margin-right: 0.5rem;
 }
-
 
 .logout {
   display: flex;
@@ -120,8 +119,8 @@
   padding: 1rem;
   border-radius: 8px;
   max-width: 20%;
-  max-height: 30%;
-  width: 400px;
+  width: 300px;
+  height: auto;
   text-align: center;
 }
 
@@ -156,10 +155,19 @@
   width: 100%;
 }
 
+.modalButtons button:first-child:hover {
+  background-color: #138496;
+}
+
 .modalButtons button:last-child {
   background-color: #ffffff;
   color: #cf3636;
   border: 1px solid #cf3636;
   border-radius: 12px;
   width: 100%;
+}
+
+.modalButtons button:last-child:hover {
+  background-color: #cf3636;
+  color: #ffffff;
 }

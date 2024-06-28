@@ -6,7 +6,7 @@ import Board from "./components/Home/Board/Board";
 import Analytics from "./components/Home/Analytics/Analytics";
 import Settings from "./components/Home/Settings/Settings";
 import PrivateRoute from "./utils/PrivateRoute";
-import ShareTask from "./components/Home/Board/ShareTask";
+import ShareTask from "./components/Home/Board/ShareTask/ShareTask.jsx";
 
 const App = () => {
   return (

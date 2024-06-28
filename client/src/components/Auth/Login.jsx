@@ -10,6 +10,9 @@ import Cookies from "js-cookie";
 import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -21,8 +24,7 @@ const Login = () => {
     password: "",
     general: "",
   });
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (location.state?.registered) {
@@ -95,6 +97,7 @@ const Login = () => {
       setErrors(errors);
     } else {
       try {
+        setIsLoading(true);
         const response = await login(formData);
         if (response.success) {
           Cookies.set("accessToken", response.token);
@@ -108,6 +111,8 @@ const Login = () => {
           "An error occurred. Please try again.";
         setErrors({ ...errors, general: errorMsg });
         console.error("Error:", errorMsg);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     }
   };
@@ -154,13 +159,15 @@ const Login = () => {
         </div>
         {errors.general && <p className={styles.error}>{errors.general}</p>}
         <button type="submit" className={styles.button}>
-          Login
+          {isLoading ? <div className={styles.loader}></div> : "Login"}
         </button>
       </form>
-      <p className={styles.registerText}>Have no account yet?</p>
-      <Link to="/register" className={styles.registerLink}>
-        Register
-      </Link>
+      <div className={styles.registerContainer}>
+        <p className={styles.registerText}>Have no account yet?</p>
+        <Link to="/register" className={styles.registerLink}>
+          Register
+        </Link>
+      </div>
       <ToastContainer />
     </div>
   );

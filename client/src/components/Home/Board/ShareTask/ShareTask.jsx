@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import logoIcon from "../../../assets/logo.png";
-import { getTaskById } from "../../../utils/task";
+import logoIcon from "../../../../assets/logo.png";
+import { getTaskById } from "../../../../utils/task";
 import styles from "./ShareTask.module.css";
 
 const ShareTask = () => {

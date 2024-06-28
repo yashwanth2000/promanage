@@ -8,8 +8,8 @@ import plusIcon from "../../../assets/plus.png";
 import downArrow from "../../../assets/arrowDown.png";
 import moreIcon from "../../../assets/threeDot.png";
 import AddPeopleModal from "./AddPeopleModal";
-import CreateTaskModal from "./CreateTaskModal";
-import UpdateTaskModal from "./UpdateTaskModal";
+import CreateTaskModal from "./CreateTask/CreateTaskModal.jsx";
+import UpdateTaskModal from "./UpdateTask/UpdateTaskModal.jsx";
 import {
   createTask,
   getAllTasks,
@@ -20,6 +20,7 @@ import {
 import copy from "copy-to-clipboard";
 import { Tooltip } from "react-tooltip";
 import styles from "./Board.module.css";
+import DeleteTaskModal from "./DeleteTaskModal.jsx";
 
 const Board = () => {
   const location = useLocation();
@@ -35,6 +36,8 @@ const Board = () => {
   const [showUpdateTaskModal, setShowUpdateTaskModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [expandedTasks, setExpandedTasks] = useState({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   useEffect(() => {
     if (location.state?.loggedIn) {
@@ -87,7 +90,9 @@ const Board = () => {
       setSelectedTaskId(taskId);
       setShowUpdateTaskModal(true);
     } else if (action === "delete") {
-      handleDeleteTask(taskId);
+      const task = tasks.find((task) => task._id === taskId);
+      setTaskToDelete(task);
+      setShowDeleteModal(true);
     }
     setActiveMenu(null);
   };
@@ -410,7 +415,7 @@ const Board = () => {
                       </p>
                       <p onClick={() => handleShareClick(task._id)}>Share</p>
                       <p
-                        onClick={() => handleDeleteTask(task._id)}
+                        onClick={() => handleMenuAction("delete", task._id)}
                         className={styles.delete}
                       >
                         Delete
@@ -519,7 +524,7 @@ const Board = () => {
               <h2>Board</h2>
               <img src={peopleIcon} alt="Add" className={styles.peopleIcon} />
               <button
-                className={styles.addButton}
+                className={styles.addPeopleButton}
                 onClick={toggleAddPeopleModal}
               >
                 Add People
@@ -581,6 +586,15 @@ const Board = () => {
           taskId={selectedTaskId}
           addedEmails={addedEmails}
           onUpdateSuccess={handleUpdateSuccess}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteTaskModal
+          onClose={() => setShowDeleteModal(false)}
+          onDelete={() => {
+            handleDeleteTask(taskToDelete._id);
+            setShowDeleteModal(false);
+          }}
         />
       )}
     </>

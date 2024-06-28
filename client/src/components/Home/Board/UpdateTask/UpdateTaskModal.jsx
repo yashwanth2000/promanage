@@ -1,15 +1,22 @@
-import { useState } from "react";
-import styles from "./CreateTaskModal.module.css";
-import DatePicker from "react-datepicker";
-import plusIcon from "../../../assets/plus.png";
-import deleteIcon from "../../../assets/delete.png";
-import downArrow from "../../../assets/arrowDown.png";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import DatePicker from "react-datepicker";
+import plusIcon from "../../../../assets/plus.png";
+import deleteIcon from "../../../../assets/delete.png";
+import downArrow from "../../../../assets/arrowDown.png";
+import { getTaskById, updateTask } from "../../../../utils/task";
+import styles from "./UpdateTaskModal.module.css";
 
-const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
+const UpdateTaskModal = ({
+  isOpen,
+  onClose,
+  taskId,
+  addedEmails,
+  onUpdateSuccess,
+}) => {
   const [formData, setFormData] = useState({
     title: "",
-    priority: null,
+    priority: "",
     assignedTo: "",
     checklist: [],
     dueDate: null,
@@ -21,6 +28,29 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
     priority: "",
     checklist: "",
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const task = await getTaskById(taskId);
+        setFormData({
+          title: task.title || "",
+          priority: task.priority
+            ? task.priority.toUpperCase() + " PRIORITY"
+            : "",
+          assignedTo: task.assignedTo || "",
+          checklist: task.checklist || [],
+          dueDate: task.dueDate ? new Date(task.dueDate) : null,
+        });
+      } catch (error) {
+        console.error("Error fetching task:", error);
+      }
+    };
+
+    if (taskId) {
+      fetchData();
+    }
+  }, [taskId]);
 
   const handleInputChange = (name, value) => {
     setFormData((prevFormData) => ({
@@ -77,7 +107,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
   const handleCancel = () => {
     setFormData({
       title: "",
-      priority: null,
+      priority: "",
       assignedTo: "",
       checklist: [],
       dueDate: null,
@@ -85,7 +115,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
     onClose();
   };
 
-  const handleSave = () => {
+  const handleUpdate = async () => {
     if (!formData.title) {
       setError((prevError) => ({
         ...prevError,
@@ -122,35 +152,26 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
       return;
     }
 
-    let priorityValue;
-    switch (formData.priority) {
-      case "HIGH PRIORITY":
-        priorityValue = "high";
-        break;
-      case "MODERATE PRIORITY":
-        priorityValue = "moderate";
-        break;
-      case "LOW PRIORITY":
-        priorityValue = "low";
-        break;
-    }
+    let priorityValue = formData.priority.split(" ")[0].toLowerCase();
 
     const formattedData = {
       ...formData,
       priority: priorityValue,
     };
 
-    onSave(formattedData);
-    setFormData({
-      title: "",
-      priority: null,
-      assignedTo: "",
-      checklist: [],
-      dueDate: null,
-    });
-    onClose();
+    try {
+      await updateTask(taskId, formattedData);
+      onUpdateSuccess("Task updated successfully");
+      onClose();
+    } catch (error) {
+      console.error("Error updating task:", error);
+      onUpdateSuccess("Failed to update task", true);
+    }
   };
 
+  const handleRemoveAssignee = () => {
+    handleInputChange("assignedTo", "");
+  };
   const handleAssigneeSelect = (email) => {
     handleInputChange("assignedTo", email);
     setIsAssigneeDropdownOpen(false);
@@ -165,7 +186,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
           className={styles.form}
           onSubmit={(e) => {
             e.preventDefault();
-            handleSave();
+            handleUpdate();
           }}
         >
           <div className={styles.taskTitle}>
@@ -247,13 +268,22 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
                 ))}
               </div>
             )}
+            {formData.assignedTo && (
+              <button
+                type="button"
+                onClick={handleRemoveAssignee}
+                className={styles.removeAssigneeButton}
+              >
+                Remove Assignee
+              </button>
+            )}
           </div>
 
           <div className={styles.checklistContainer}>
             <div className={styles.checklistSection}>
               <p className={styles.checklistTitle}>
                 Checklist (
-                {formData.checklist.filter((item) => item.done).length}/
+                {formData.checklist.filter((item) => item.completed).length}/
                 {formData.checklist.length}){" "}
                 <span className={styles.required}>*</span>
               </p>
@@ -318,7 +348,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
               </button>
               <button
                 type="button"
-                onClick={handleSave}
+                onClick={handleUpdate}
                 className={styles.saveButton}
               >
                 Save
@@ -331,11 +361,12 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, addedEmails }) => {
   );
 };
 
-CreateTaskModal.propTypes = {
+UpdateTaskModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
+  taskId: PropTypes.string.isRequired,
   addedEmails: PropTypes.array.isRequired,
+  onUpdateSuccess: PropTypes.func.isRequired,
 };
 
-export default CreateTaskModal;
+export default UpdateTaskModal;

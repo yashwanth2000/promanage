@@ -21,7 +21,7 @@ const taskSchema = new mongoose.Schema(
           type: Boolean,
           default: false,
         },
-      }
+      },
     ],
     assignedTo: {
       type: String,
@@ -34,7 +34,11 @@ const taskSchema = new mongoose.Schema(
     },
     dueDate: {
       type: Date,
-    }
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

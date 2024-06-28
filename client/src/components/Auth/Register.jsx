@@ -11,6 +11,8 @@ import { toast, ToastContainer } from "react-toastify";
 
 const Register = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,7 +30,7 @@ const Register = () => {
     confirmPassword: "",
     general: "",
   });
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (location.state?.deleted) {
@@ -86,6 +88,7 @@ const Register = () => {
       setErrors(errors);
     } else {
       try {
+        setIsLoading(true);
         const response = await register(formData);
         if (response.success) {
           navigate("/", { state: { registered: true } });
@@ -96,6 +99,8 @@ const Register = () => {
           "An error occurred. Please try again.";
         setErrors({ ...errors, general: errorMsg });
         console.error("Error:", errorMsg);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -184,13 +189,15 @@ const Register = () => {
         </div>
         {errors.general && <p className={styles.error}>{errors.general}</p>}
         <button type="submit" className={styles.button}>
-          Register
+          {isLoading ? <div className={styles.loader}></div> : "Register"}
         </button>
       </form>
-      <p className={styles.registerText}>Have an account?</p>
-      <Link to="/" className={styles.loginLink}>
-        Login
-      </Link>
+      <div className={styles.loginContainer}>
+        <p className={styles.registerText}>Have an account?</p>
+        <Link to="/" className={styles.loginLink}>
+          Login
+        </Link>
+      </div>
       <ToastContainer />
     </div>
   );

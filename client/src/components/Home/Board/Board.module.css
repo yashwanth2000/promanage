@@ -58,19 +58,11 @@
   margin-right: 5px;
 }
 
-.addButton {
+.addPeopleButton {
   color: #000;
   border: none;
   background: none;
   cursor: pointer;
-}
-
-.collapseAllIcon {
-  opacity: 0.5;
-}
-
-.collapseAllIcon:hover {
-  opacity: 1;
 }
 
 .timeFilter {
@@ -139,6 +131,14 @@
 }
 
 .plusIcon:hover {
+  opacity: 1;
+}
+
+.collapseAllIcon {
+  opacity: 0.5;
+}
+
+.collapseAllIcon:hover {
   opacity: 1;
 }
 

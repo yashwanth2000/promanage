@@ -17,6 +17,7 @@ export const createTask = async (req, res, next) => {
     if (!checklist) {
       return next(errorHandler(400, "Create at least One checklist"));
     }
+
     const newTask = new Task({
       title,
       priority,
@@ -24,7 +25,9 @@ export const createTask = async (req, res, next) => {
       status,
       checklist,
       dueDate,
+      createdBy: req.user.id,
     });
+
     const task = await newTask.save();
     res
       .status(201)
@@ -50,6 +53,7 @@ export const getTaskById = async (req, res, next) => {
 export const getAllTasks = async (req, res, next) => {
   try {
     const { filter = "week" } = req.query;
+    const userId = req.user.id;
     let dateFilter = {};
 
     switch (filter) {
@@ -87,7 +91,7 @@ export const getAllTasks = async (req, res, next) => {
         break;
     }
 
-    const tasks = await Task.find(dateFilter);
+    const tasks = await Task.find({ ...dateFilter, createdBy: userId });
     res.status(200).json({ success: true, tasks });
   } catch (error) {
     next(errorHandler(500, "Internal Server Error"));
