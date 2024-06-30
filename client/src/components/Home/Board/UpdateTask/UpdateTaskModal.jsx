@@ -164,8 +164,11 @@ const UpdateTaskModal = ({
       onUpdateSuccess("Task updated successfully");
       onClose();
     } catch (error) {
-      console.error("Error updating task:", error);
-      onUpdateSuccess("Failed to update task", true);
+      if (error.response && error.response.data) {
+        onUpdateSuccess(error.response.data.message, true);
+      } else {
+        onUpdateSuccess("Error updating task. Please try again.", true);
+      }
     }
   };
 

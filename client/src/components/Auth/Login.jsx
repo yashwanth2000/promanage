@@ -37,8 +37,10 @@ const Login = () => {
         draggable: true,
         theme: "light",
       });
+
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]);
 
   useEffect(() => {
     if (location.state?.loggedOut) {
@@ -51,8 +53,10 @@ const Login = () => {
         draggable: true,
         theme: "light",
       });
+
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]);
 
   useEffect(() => {
     if (location.state?.passwordChanged) {
@@ -65,8 +69,10 @@ const Login = () => {
         draggable: true,
         theme: "light",
       });
+
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -112,7 +118,7 @@ const Login = () => {
         setErrors({ ...errors, general: errorMsg });
         console.error("Error:", errorMsg);
       } finally {
-        setIsLoading(false); // Stop loading
+        setIsLoading(false);
       }
     }
   };
@@ -122,39 +128,45 @@ const Login = () => {
       <h2>Login</h2>
       <form onSubmit={handleSubmit} className={styles.registerForm}>
         <div className={styles.inputContainer}>
-          <img src={emailIcon} alt="Email Icon" className={styles.inputIcon} />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className={styles.inputField}
-          />
+          <div className={styles.inputWrapper}>
+            <img
+              src={emailIcon}
+              alt="Email Icon"
+              className={styles.inputIcon}
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
           {errors.email && <p className={styles.error}>{errors.email}</p>}
         </div>
         <div className={styles.inputContainer}>
-          <img
-            src={passwordIcon}
-            alt="Password Icon"
-            className={styles.inputIcon}
-          />
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className={styles.inputField}
-          />
-          <img
-            src={showPasswordIcon ? hideEye : showEye}
-            alt={showPassword ? "Hide Password" : "Show Password"}
-            className={`${styles.showIcon} ${
-              showPassword ? styles.active : ""
-            }`}
-            onClick={togglePasswordVisibility}
-          />
+          <div className={styles.inputWrapper}>
+            <img
+              src={passwordIcon}
+              alt="Password Icon"
+              className={styles.inputIcon}
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+            <img
+              src={showPasswordIcon ? hideEye : showEye}
+              alt={showPassword ? "Hide Password" : "Show Password"}
+              className={styles.showIcon}
+              onClick={togglePasswordVisibility}
+            />
+          </div>
           {errors.password && <p className={styles.error}>{errors.password}</p>}
         </div>
         {errors.general && <p className={styles.error}>{errors.general}</p>}
@@ -162,6 +174,7 @@ const Login = () => {
           {isLoading ? <div className={styles.loader}></div> : "Login"}
         </button>
       </form>
+
       <div className={styles.registerContainer}>
         <p className={styles.registerText}>Have no account yet?</p>
         <Link to="/register" className={styles.registerLink}>

@@ -12,7 +12,7 @@ import { toast, ToastContainer } from "react-toastify";
 const Register = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -43,8 +43,10 @@ const Register = () => {
         draggable: true,
         theme: "light",
       });
+
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -110,79 +112,91 @@ const Register = () => {
       <h2>Register</h2>
       <form onSubmit={handleSubmit} className={styles.registerForm}>
         <div className={styles.inputContainer}>
-          <img src={nameIcon} alt="Name Icon" className={styles.inputIcon} />
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={formData.name}
-            onChange={handleChange}
-            className={styles.inputField}
-          />
+          <div className={styles.inputWrapper}>
+            <img src={nameIcon} alt="Name Icon" className={styles.inputIcon} />
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              value={formData.name}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
           {errors.name && <p className={styles.error}>{errors.name}</p>}
         </div>
         <div className={styles.inputContainer}>
-          <img src={emailIcon} alt="Email Icon" className={styles.inputIcon} />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className={styles.inputField}
-          />
+          <div className={styles.inputWrapper}>
+            <img
+              src={emailIcon}
+              alt="Email Icon"
+              className={styles.inputIcon}
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+          </div>
           {errors.email && <p className={styles.error}>{errors.email}</p>}
         </div>
         <div className={styles.inputContainer}>
-          <img
-            src={passwordIcon}
-            alt="Password Icon"
-            className={styles.inputIcon}
-          />
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className={styles.inputField}
-          />
-          <img
-            src={showPassword ? hideEye : showEye}
-            alt={showPassword ? "Hide Password" : "Show Password"}
-            className={`${styles.showIcon} ${
-              showPassword ? styles.active : ""
-            }`}
-            onClick={togglePasswordVisibility}
-          />
+          <div className={styles.inputWrapper}>
+            <img
+              src={passwordIcon}
+              alt="Password Icon"
+              className={styles.inputIcon}
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+            <img
+              src={showPassword ? hideEye : showEye}
+              alt={showPassword ? "Hide Password" : "Show Password"}
+              className={`${styles.showIcon} ${
+                showPassword ? styles.active : ""
+              }`}
+              onClick={togglePasswordVisibility}
+            />
+          </div>
           {errors.password && <p className={styles.error}>{errors.password}</p>}
         </div>
         <div className={styles.inputContainer}>
-          <img
-            src={passwordIcon}
-            alt="Confirm Password Icon"
-            className={styles.inputIcon}
-          />
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className={styles.inputField}
-          />
-          <img
-            src={showConfirmPassword ? hideEye : showEye}
-            alt={
-              showConfirmPassword
-                ? "Hide Confirm Password"
-                : "Show Confirm Password"
-            }
-            className={`${styles.showIcon} ${
-              showConfirmPassword ? styles.active : ""
-            }`}
-            onClick={toggleConfirmPasswordVisibility}
-          />
+          <div className={styles.inputWrapper}>
+            <img
+              src={passwordIcon}
+              alt="Confirm Password Icon"
+              className={styles.inputIcon}
+            />
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={styles.inputField}
+            />
+            <img
+              src={showConfirmPassword ? hideEye : showEye}
+              alt={
+                showConfirmPassword
+                  ? "Hide Confirm Password"
+                  : "Show Confirm Password"
+              }
+              className={`${styles.showIcon} ${
+                showConfirmPassword ? styles.active : ""
+              }`}
+              onClick={toggleConfirmPasswordVisibility}
+            />
+          </div>
           {errors.confirmPassword && (
             <p className={styles.error}>{errors.confirmPassword}</p>
           )}
@@ -193,7 +207,7 @@ const Register = () => {
         </button>
       </form>
       <div className={styles.loginContainer}>
-        <p className={styles.registerText}>Have an account?</p>
+        <p className={styles.loginText}>Have an account?</p>
         <Link to="/" className={styles.loginLink}>
           Login
         </Link>

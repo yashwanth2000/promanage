@@ -19,19 +19,19 @@
 .content {
   display: flex;
   flex-direction: row;
-  margin-top: 1.8rem;
+  margin-top: 1rem;
 }
 
 .content div {
-  width: 25%;
+  width: 30%;
   padding: 1rem;
 }
 
 .firstList,
 .secondList {
-  background-color: #f9fcff;
-  border-radius: 10px;
-  padding: 1.8rem;
+  background-color: #F9FCFF;
+  border-radius: 12px;
+  padding: 1.5rem;
 }
 
 .firstList li,
@@ -57,7 +57,6 @@
 }
 
 .label {
-  margin-right: auto;
   font-family: "Open Sans", sans-serif;
   font-size: 16px;
   font-weight: 400;
@@ -65,8 +64,6 @@
 }
 
 .value {
-  text-align: right;
-  min-width: 2em;
   font-family: "Open Sans", sans-serif;
   font-size: 18px;
   font-weight: 600;

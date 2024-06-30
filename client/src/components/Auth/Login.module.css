@@ -1,3 +1,7 @@
+:root {
+  font-size: 16px;
+}
+
 .loginContainer {
   display: flex;
   justify-content: center;
@@ -20,7 +24,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 400px;
+  max-width: 25rem;
   padding: 2rem;
 }
 
@@ -28,24 +32,26 @@
   position: relative;
   width: 100%;
   margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
 }
 
 .inputIcon {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 0.625rem;
   transform: translateY(-50%);
   width: 20px;
   height: auto;
   pointer-events: none;
+  z-index: 1;
 }
 
 .inputField {
   padding: 0.8rem 0.8rem 0.8rem 2.5rem;
-  margin-left: 0;
   font-size: 1rem;
   width: 100%;
   outline: none;
@@ -56,18 +62,18 @@
 .error {
   color: red;
   font-size: 0.8rem;
-  margin-top: 0.2rem;
-  margin-left: 0.5rem;
+  margin-top: 0.625rem;
 }
 
 .showIcon {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 0.625rem;
   transform: translateY(-50%);
-  width: 20px;
+  width: 1.25rem;
   height: auto;
   cursor: pointer;
+  z-index: 1;
 }
 
 .button {
@@ -95,8 +101,8 @@
 }
 
 .loader {
-  border: 2px solid #f3f3f3;
-  border-top: 4px solid #17a2b8;
+  border: 0.125rem solid #f3f3f3;
+  border-top: 0.25rem solid #17a2b8;
   border-radius: 50%;
   width: 20px;
   height: 20px;

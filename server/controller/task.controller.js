@@ -54,6 +54,8 @@ export const getAllTasks = async (req, res, next) => {
   try {
     const { filter = "week" } = req.query;
     const userId = req.user.id;
+    const userEmail = req.user.email;
+
     let dateFilter = {};
 
     switch (filter) {
@@ -91,7 +93,14 @@ export const getAllTasks = async (req, res, next) => {
         break;
     }
 
-    const tasks = await Task.find({ ...dateFilter, createdBy: userId });
+    const tasks = await Task.find({
+      $and: [
+        dateFilter,
+        {
+          $or: [{ createdBy: userId }, { assignedTo: userEmail }],
+        },
+      ],
+    });
     res.status(200).json({ success: true, tasks });
   } catch (error) {
     next(errorHandler(500, "Internal Server Error"));
@@ -119,32 +128,54 @@ export const updateTask = async (req, res, next) => {
   try {
     const { title, priority, assignedTo, checklist, status, dueDate } =
       req.body;
+    const taskId = req.params.id;
+    const userId = req.user.id;
+    const userEmail = req.user.email;
 
-    const currentTask = await Task.findById(req.params.id);
+    const currentTask = await Task.findById(taskId);
 
     if (!currentTask) {
       return next(errorHandler(404, "Task not found"));
     }
 
     if (
-      title === currentTask.title &&
-      priority === currentTask.priority &&
-      assignedTo === currentTask.assignedTo &&
-      JSON.stringify(checklist) === JSON.stringify(currentTask.checklist) &&
-      status === currentTask.status &&
-      dueDate === currentTask.dueDate
+      currentTask.createdBy.toString() !== userId &&
+      currentTask.assignedTo !== userEmail
     ) {
-      return res.status(400).json({
-        success: false,
-        message: "No changes detected. Task data is the same.",
-      });
+      return next(
+        errorHandler(403, "You don't have permission to update this task")
+      );
     }
 
-    const updatedTask = await Task.findByIdAndUpdate(
-      req.params.id,
-      { title, priority, assignedTo, checklist, status, dueDate },
-      { new: true }
-    );
+    // If the user is the assigned user (not the creator), prevent changing or removing assignedTo
+    if (currentTask.createdBy.toString() !== userId) {
+      if (assignedTo !== currentTask.assignedTo) {
+        return next(
+          errorHandler(
+            403,
+            "Assigned users cannot change or Remove the assignee"
+          )
+        );
+      }
+    }
+
+    const updateObj = {
+      title,
+      priority,
+      checklist,
+      status,
+      dueDate,
+    };
+
+    if (currentTask.createdBy.toString() === userId) {
+      updateObj.assignedTo = assignedTo;
+    } else {
+      updateObj.assignedTo = currentTask.assignedTo;
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(taskId, updateObj, {
+      new: true,
+    });
 
     res.status(200).json({
       success: true,
@@ -152,7 +183,6 @@ export const updateTask = async (req, res, next) => {
       message: "Task updated successfully",
     });
   } catch (error) {
-    console.log(error);
     next(errorHandler(500, "Internal Server Error"));
   }
 };
@@ -230,9 +260,14 @@ export const updateSubtaskCompletion = async (req, res, next) => {
   }
 };
 
-export const getTaskStats = async (req, res) => {
+export const getTaskStats = async (req, res, next) => {
   try {
-    const tasks = await Task.find();
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+
+    const tasks = await Task.find({
+      $or: [{ createdBy: userId }, { assignedTo: userEmail }],
+    });
 
     let backlogCount = 0;
     let todoCount = 0;
@@ -242,8 +277,16 @@ export const getTaskStats = async (req, res) => {
     let moderatePriorityCount = 0;
     let highPriorityCount = 0;
     let dueDateTasksCount = 0;
+    let createdTasksCount = 0;
+    let assignedTasksCount = 0;
 
     tasks.forEach((task) => {
+      if (task.createdBy.toString() === userId) {
+        createdTasksCount++;
+      } else {
+        assignedTasksCount++;
+      }
+
       switch (task.status) {
         case "Backlog":
           backlogCount++;
@@ -275,7 +318,7 @@ export const getTaskStats = async (req, res) => {
           break;
       }
 
-      if (task.dueDate && new Date(task.dueDate) < new Date()) {
+      if (task.dueDate) {
         dueDateTasksCount++;
       }
     });
@@ -289,6 +332,8 @@ export const getTaskStats = async (req, res) => {
       moderatePriorityTasks: moderatePriorityCount,
       highPriorityTasks: highPriorityCount,
       dueDateTasks: dueDateTasksCount,
+      createdTasks: createdTasksCount,
+      assignedTasks: assignedTasksCount,
     };
 
     res.status(200).json({ success: true, analytics: taskStats });

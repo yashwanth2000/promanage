@@ -14,6 +14,8 @@ const Analytics = () => {
     moderatePriorityTasks: 0,
     highPriorityTasks: 0,
     dueDateTasks: 0,
+    createdTasks: 0,
+    assignedTasks: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -56,6 +58,10 @@ const Analytics = () => {
           <div className={styles.content}>
             <div>
               <ul className={styles.firstList}>
+              <li>
+                  <span className={styles.label}>Created Tasks</span>
+                  <span className={styles.value}>{stats.createdTasks}</span>
+                </li>
                 <li>
                   <span className={styles.label}>Backlog Tasks</span>
                   <span className={styles.value}>{stats.backlogTasks}</span>
@@ -77,6 +83,10 @@ const Analytics = () => {
 
             <div>
               <ul className={styles.secondList}>
+              <li>
+                  <span className={styles.label}>Assigned Tasks</span>
+                  <span className={styles.value}>{stats.assignedTasks}</span>
+                </li>
                 <li>
                   <span className={styles.label}>Low Priority</span>
                   <span className={styles.value}>{stats.lowPriorityTasks}</span>

@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import NavBar from "../Navbar/NavBar";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import peopleIcon from "../../../assets/addpeople.png";
 import collapseAllIcon from "../../../assets/collapse-all.png";
 import plusIcon from "../../../assets/plus.png";
 import downArrow from "../../../assets/arrowDown.png";
 import moreIcon from "../../../assets/threeDot.png";
-import AddPeopleModal from "./AddPeopleModal";
+import AddPeopleModal from "./AddPeople/AddPeopleModal.jsx";
 import CreateTaskModal from "./CreateTask/CreateTaskModal.jsx";
 import UpdateTaskModal from "./UpdateTask/UpdateTaskModal.jsx";
 import {
@@ -21,9 +21,11 @@ import copy from "copy-to-clipboard";
 import { Tooltip } from "react-tooltip";
 import styles from "./Board.module.css";
 import DeleteTaskModal from "./DeleteTaskModal.jsx";
+import SkeletonTaskCard from "../../../utils/SkeletonTaskCard.jsx";
 
 const Board = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const menuRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -39,6 +41,13 @@ const Board = () => {
   const [expandedTasks, setExpandedTasks] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [taskCounts, setTaskCounts] = useState({
+    backlog: 0,
+    todo: 0,
+    inprogress: 0,
+    done: 0,
+  });
 
   useEffect(() => {
     if (location.state?.loggedIn) {
@@ -51,13 +60,15 @@ const Board = () => {
         draggable: true,
         theme: "light",
       });
+
+      navigate(location.pathname, { replace: true });
     }
 
     const storedEmails = JSON.parse(localStorage.getItem("addedEmails")) || [];
     setAddedEmails(storedEmails);
 
     fetchTasks();
-  }, [location.state, timeFilter]);
+  }, [location.state, timeFilter, navigate, location.pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -74,8 +85,21 @@ const Board = () => {
 
   const fetchTasks = async () => {
     try {
+      setLoading(true);
       const response = await getAllTasks(timeFilter);
       setTasks(response.tasks);
+      const counts = response.tasks.reduce((acc, task) => {
+        const status = task.status.toLowerCase().replace(/\s+/g, "");
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      setTaskCounts({
+        backlog: counts.backlog || 0,
+        todo: counts.todo || 0,
+        inprogress: counts.inprogress || 0,
+        done: counts.done || 0,
+      });
     } catch (error) {
       console.error("Error fetching tasks:", error);
       toast.error("Failed to fetch tasks", {
@@ -87,6 +111,8 @@ const Board = () => {
         draggable: true,
         theme: "light",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -357,7 +383,7 @@ const Board = () => {
     if (isError) {
       toast.error(message, {
         position: "top-right",
-        autoClose: 500,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -378,9 +404,20 @@ const Board = () => {
 
   const renderTasks = (status) => {
     const statusOptions = ["Backlog", "To do", "In Progress", "Done"];
+    const statusKey = status.toLowerCase().replace(/\s+/g, "");
+    console.log(statusKey);
+
+    const count = taskCounts[(statusKey || 0, 1)];
+    console.log(count);
+
+    if (loading) {
+      return Array(count)
+        .fill(0)
+        .map((_, index) => <SkeletonTaskCard key={index} />);
+    }
 
     return (
-      <div className={styles.columnContent}>
+      <div>
         {tasks
           .filter((task) => task.status.toLowerCase() === status.toLowerCase())
           .map((task) => {
@@ -488,19 +525,21 @@ const Board = () => {
                   )}
                 </div>
                 <div className={styles.taskFooter}>
-                  <span
-                    className={`${styles.dueDate} ${
-                      task.dueDate
-                        ? task.status.toLowerCase() === "done"
+                  {task.dueDate ? (
+                    <span
+                      className={`${styles.dueDate} ${
+                        task.status.toLowerCase() === "done"
                           ? styles.doneDueDate
                           : isPastDate(task.dueDate)
                           ? styles.pastDueDate
                           : ""
-                        : styles.hidden
-                    }`}
-                  >
-                    {task.dueDate && formattedDueDate(task.dueDate)}
-                  </span>
+                      }`}
+                    >
+                      {formattedDueDate(task.dueDate)}
+                    </span>
+                  ) : (
+                    <div className={styles.dueDatePlaceholder}></div>
+                  )}
 
                   <div className={styles.statusContainer}>
                     {otherStatuses.map((statusOption) => (
