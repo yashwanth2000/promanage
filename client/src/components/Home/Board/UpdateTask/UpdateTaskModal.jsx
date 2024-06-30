@@ -28,10 +28,12 @@ const UpdateTaskModal = ({
     priority: "",
     checklist: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const task = await getTaskById(taskId);
         setFormData({
           title: task.title || "",
@@ -44,6 +46,8 @@ const UpdateTaskModal = ({
         });
       } catch (error) {
         console.error("Error fetching task:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -181,6 +185,16 @@ const UpdateTaskModal = ({
   };
 
   if (!isOpen) return null;
+
+  if (isLoading) {
+    return (
+      <div className={styles.loaderModalOverlay}>
+        <div className={styles.loaderModalContent}>
+          <div className={styles.loader}></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.modalOverlay}>

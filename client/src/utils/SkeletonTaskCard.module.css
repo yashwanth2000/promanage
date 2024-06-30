@@ -39,7 +39,7 @@
 .skeletonDate,
 .skeletonStatus {
   background-color: #e0e0e0;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .skeletonTitle {
@@ -70,7 +70,6 @@
   width: 40%;
 }
 
-/* Skeleton checklist items */
 .skeletonChecklistItem {
   display: flex;
   align-items: center;

@@ -405,10 +405,7 @@ const Board = () => {
   const renderTasks = (status) => {
     const statusOptions = ["Backlog", "To do", "In Progress", "Done"];
     const statusKey = status.toLowerCase().replace(/\s+/g, "");
-    console.log(statusKey);
-
     const count = taskCounts[(statusKey || 0, 1)];
-    console.log(count);
 
     if (loading) {
       return Array(count)
