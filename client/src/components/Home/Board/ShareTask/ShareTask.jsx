@@ -16,23 +16,35 @@ const ShareTask = () => {
     dueDate: null,
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchTask = async () => {
-      const task = await getTaskById(id);
-      setTaskData({
-        title: task.title,
-        priority: task.priority,
-        assignedTo: task.assignedTo,
-        checklist: task.checklist,
-        dueDate: task.dueDate,
-      });
+      try {
+        const task = await getTaskById(id);
+        setTaskData({
+          title: task.title,
+          priority: task.priority,
+          assignedTo: task.assignedTo,
+          checklist: task.checklist,
+          dueDate: task.dueDate,
+        });
+      } catch (err) {
+        toast.error("Failed to fetch task data.", {
+          position: "top-right",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchTask();
   }, [id]);
-
-  if (!taskData) {
-    return <p className={styles.loading}>Loading...</p>;
-  }
 
   const getPriorityLabel = (priority) => {
     switch (priority) {
@@ -95,53 +107,56 @@ const ShareTask = () => {
         <img src={logoIcon} alt="Logo" className={styles.logoIcon} />
         <h2 className={styles.title}>ProManage</h2>
       </div>
+      {isLoading ? (
+        <div className={styles.loader}></div>
+      ) : (
+        <div className={styles.shareTaskContainer}>
+          <div className={styles.content}>
+            <div className={styles.priorityContainer}>
+              <div
+                className={`${styles.priorityIndicator} ${
+                  styles[taskData.priority]
+                }`}
+              />
+              <p className={styles.priorityLabel}>
+                {getPriorityLabel(taskData.priority)}
+              </p>
+              {taskData.assignedTo && (
+                <div className={styles.assigneeAvatar}>
+                  {getInitials(taskData.assignedTo)}
+                </div>
+              )}
+            </div>
+            <h4 className={styles.taskTitle}>{taskData.title}</h4>
 
-      <div className={styles.shareTaskContainer}>
-        <div className={styles.content}>
-          <div className={styles.priorityContainer}>
-            <div
-              className={`${styles.priorityIndicator} ${
-                styles[taskData.priority]
-              }`}
-            />
-            <p className={styles.priorityLabel}>
-              {getPriorityLabel(taskData.priority)}
-            </p>
-            {taskData.assignedTo && (
-              <div className={styles.assigneeAvatar}>
-                {getInitials(taskData.assignedTo)}
+            <div className={styles.taskChecklistContainer}>
+              <p>
+                Checklist (
+                {taskData.checklist.filter((item) => item.completed).length}/
+                {taskData.checklist.length})
+              </p>
+              {taskData.checklist.map((item) => (
+                <div key={item._id} className={styles.subtaskItem}>
+                  <input
+                    type="checkbox"
+                    checked={item.completed}
+                    className={styles.subtaskCheckbox}
+                    readOnly
+                    onClick={handleCheckboxClick}
+                  />
+                  <span className={styles.subtaskText}>{item.task}</span>
+                </div>
+              ))}
+            </div>
+
+            {taskData.dueDate && (
+              <div className={styles.dueDate}>
+                Due Date: <span>{formattedDueDate(taskData.dueDate)}</span>
               </div>
             )}
           </div>
-          <h4 className={styles.taskTitle}>{taskData.title}</h4>
-
-          <div className={styles.taskChecklistContainer}>
-            <p>
-              Checklist (
-              {taskData.checklist.filter((item) => item.completed).length}/
-              {taskData.checklist.length})
-            </p>
-            {taskData.checklist.map((item) => (
-              <div key={item._id} className={styles.subtaskItem}>
-                <input
-                  type="checkbox"
-                  checked={item.completed}
-                  className={styles.subtaskCheckbox}
-                  readOnly
-                  onClick={handleCheckboxClick}
-                />
-                <span className={styles.subtaskText}>{item.task}</span>
-              </div>
-            ))}
-          </div>
-
-          {taskData.dueDate && (
-            <div className={styles.dueDate}>
-              Due Date: <span>{formattedDueDate(taskData.dueDate)}</span>
-            </div>
-          )}
         </div>
-      </div>
+      )}
       <ToastContainer />
     </div>
   );

@@ -17,7 +17,7 @@ const Analytics = () => {
     createdTasks: 0,
     assignedTasks: 0,
   });
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -31,7 +31,7 @@ const Analytics = () => {
       } catch (error) {
         toast.error("Failed to load analytics", {
           position: "top-right",
-          autoClose: 500,
+          autoClose: 1000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
@@ -40,7 +40,7 @@ const Analytics = () => {
         });
         console.error("Error fetching statistics:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -52,7 +52,7 @@ const Analytics = () => {
       <NavBar />
       <div className={styles.container}>
         <h2>Analytics</h2>
-        {loading ? (
+        {isLoading ? (
           <div className={styles.loader}></div>
         ) : (
           <div className={styles.content}>

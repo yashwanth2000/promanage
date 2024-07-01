@@ -33,7 +33,6 @@ export const createTask = async (req, res, next) => {
       .status(201)
       .json({ success: true, message: "Task created successfully", task });
   } catch (error) {
-    console.log(error);
     next(errorHandler(500, "Internal Server Error"));
   }
 };
@@ -206,7 +205,6 @@ export const updateTaskStatus = async (req, res, next) => {
       message: "Task status updated successfully",
     });
   } catch (error) {
-    console.log(error);
     next(errorHandler(500, "Internal Server Error"));
   }
 };

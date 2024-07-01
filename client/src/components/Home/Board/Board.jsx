@@ -41,7 +41,7 @@ const Board = () => {
   const [expandedTasks, setExpandedTasks] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [taskCounts, setTaskCounts] = useState({
     backlog: 0,
     todo: 0,
@@ -85,7 +85,7 @@ const Board = () => {
 
   const fetchTasks = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await getAllTasks(timeFilter);
       setTasks(response.tasks);
       const counts = response.tasks.reduce((acc, task) => {
@@ -104,7 +104,7 @@ const Board = () => {
       console.error("Error fetching tasks:", error);
       toast.error("Failed to fetch tasks", {
         position: "top-right",
-        autoClose: 500,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -112,7 +112,7 @@ const Board = () => {
         theme: "light",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -161,61 +161,6 @@ const Board = () => {
     }
   };
 
-  const handleSaveTask = async (taskData) => {
-    try {
-      const task = await createTask(taskData);
-      if (task) {
-        toast.success("Task created successfully", {
-          position: "top-right",
-          autoClose: 500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          theme: "light",
-        });
-        fetchTasks();
-      }
-    } catch (error) {
-      toast.error("Failed to create task", {
-        position: "top-right",
-        autoClose: 500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        theme: "light",
-      });
-      console.error("Error creating task:", error);
-    }
-    setShowCreateTaskModal(false);
-  };
-
-  const handleDeleteTask = async (taskId) => {
-    try {
-      await deleteTask(taskId);
-      toast.success("Task deleted successfully", {
-        position: "top-right",
-        autoClose: 500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        theme: "light",
-      });
-      fetchTasks();
-    } catch (error) {
-      toast.error("Failed to delete task", {
-        position: "top-right",
-        autoClose: 500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-      });
-    }
-  };
-
   const handleShowSubTasks = (taskId) => {
     setExpandedTasks((prevState) => ({
       ...prevState,
@@ -234,6 +179,7 @@ const Board = () => {
     setExpandedTasks(updatedExpandedTasks);
   };
 
+  //util functions
   const options = { day: "2-digit", month: "short", year: "numeric" };
 
   const formattedDate = new Date()
@@ -273,6 +219,7 @@ const Board = () => {
     return dueDate < today;
   };
 
+  
   const getPriorityLabel = (priority) => {
     switch (priority.toLowerCase()) {
       case "low":
@@ -287,6 +234,62 @@ const Board = () => {
   const getInitials = (email) => {
     const [name] = email.split("@");
     return name.substring(0, 2).toUpperCase();
+  };
+
+    //Updates
+  const handleSaveTask = async (taskData) => {
+    try {
+      const task = await createTask(taskData);
+      if (task) {
+        toast.success("Task created successfully", {
+          position: "top-right",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "light",
+        });
+        fetchTasks();
+      }
+    } catch (error) {
+      toast.error("Failed to create task", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      console.error("Error creating task:", error);
+    }
+    setShowCreateTaskModal(false);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(taskId);
+      toast.success("Task deleted successfully", {
+        position: "top-right",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
+      fetchTasks();
+    } catch (error) {
+      toast.error("Failed to delete task", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+      });
+    }
   };
 
   const handleShareClick = (taskId) => {
@@ -307,7 +310,7 @@ const Board = () => {
       } else {
         toast.error("Failed to copy. Please try again.", {
           position: "top-right",
-          autoClose: 500,
+          autoClose: 1000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
@@ -317,7 +320,6 @@ const Board = () => {
       }
     } catch (error) {
       console.error("Failed to copy to clipboard:", error);
-      toast.error("An error occurred. Please try again.");
     }
 
     setActiveMenu(null);
@@ -353,7 +355,7 @@ const Board = () => {
       console.error("Error updating subtask:", error);
       toast.error("Failed to update subtask", {
         position: "top-right",
-        autoClose: 500,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -370,7 +372,7 @@ const Board = () => {
     } catch (error) {
       toast.error("Failed to update task status", {
         position: "top-right",
-        autoClose: 500,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
@@ -402,12 +404,13 @@ const Board = () => {
     fetchTasks();
   };
 
+  // render tasks
   const renderTasks = (status) => {
     const statusOptions = ["Backlog", "To do", "In Progress", "Done"];
     const statusKey = status.toLowerCase().replace(/\s+/g, "");
     const count = taskCounts[(statusKey || 0, 1)];
 
-    if (loading) {
+    if (isLoading) {
       return Array(count)
         .fill(0)
         .map((_, index) => <SkeletonTaskCard key={index} />);
