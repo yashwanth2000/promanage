@@ -1,6 +1,6 @@
 # Pro Manage | Project Task Manager
 
-Pro Manage is a project management application designed to help users manage tasks efficiently. Users can create, edit, update, delete, and assign tasks to themselves and team members. The app also includes features for user management, task sharing, analytics, and task filtering.
+Pro Manage is a project management application designed to help users manage tasks efficiently, built using the MERN (MongoDB, Express.js, React, Node.js) stack. Users can create, edit, update, delete, and assign tasks to themselves and team members. The app also includes features for user management, task sharing, analytics, and task filtering.
 
 # Features
 
