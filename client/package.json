@@ -17,11 +17,13 @@
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-datepicker": "^7.1.0",
     "react-dom": "^18.2.0",
+    "react-loading-skeleton": "^3.5.0",
     "react-router-dom": "^6.23.1",
     "react-toastify": "^10.0.5",
-    "react-tooltip": "^5.27.0"
+    "react-tooltip": "^5.28.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

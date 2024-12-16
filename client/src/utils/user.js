@@ -20,16 +20,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-export const getUserDataById = async (userId) => {
-  try {
-    const response = await axiosInstance.get(`/api/user/get/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
-  }
-};
-
 export const updateUser = async (userId, data) => {
   try {
     const response = await axiosInstance.put(

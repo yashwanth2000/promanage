@@ -21,7 +21,9 @@ import copy from "copy-to-clipboard";
 import { Tooltip } from "react-tooltip";
 import styles from "./Board.module.css";
 import DeleteTaskModal from "./DeleteTaskModal.jsx";
-import SkeletonTaskCard from "../../../utils/SkeletonTaskCard.jsx";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Board = () => {
   const location = useLocation();
@@ -83,11 +85,13 @@ const Board = () => {
     };
   }, []);
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (shouldSetLoading = true) => {
     try {
-      setIsLoading(true);
+      if (shouldSetLoading) setIsLoading(true);
+
       const response = await getAllTasks(timeFilter);
       setTasks(response.tasks);
+
       const counts = response.tasks.reduce((acc, task) => {
         const status = task.status.toLowerCase().replace(/\s+/g, "");
         acc[status] = (acc[status] || 0) + 1;
@@ -112,7 +116,58 @@ const Board = () => {
         theme: "light",
       });
     } finally {
-      setIsLoading(false);
+      if (shouldSetLoading) setIsLoading(false);
+    }
+  };
+
+  const onDragEnd = async (result) => {
+    const { source, destination } = result;
+
+    // Prevent drops outside a droppable area or within the same column
+    if (!destination || source.droppableId === destination.droppableId) return;
+
+    const draggedTask = tasks.find((task) => task._id === result.draggableId);
+
+    if (!draggedTask) {
+      console.error("Could not find dragged task");
+      return;
+    }
+
+    // update local state
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task._id === draggedTask._id
+          ? { ...task, status: destination.droppableId }
+          : task
+      )
+    );
+
+    try {
+      await updateTaskStatus(draggedTask._id, destination.droppableId);
+
+      // toast.info(`Task status updated to ${destination.droppableId}`, {
+      //   position: "top-right",
+      //   autoClose: 1000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: false,
+      //   draggable: true,
+      //   theme: "light",
+      // });
+      
+      // Fetch tasks in the background to ensure consistency
+      fetchTasks(false);
+    } catch (error) {
+      console.error("Drag and drop update failed:", error);
+      toast.error("Failed to update task status", {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "light",
+      });
     }
   };
 
@@ -218,8 +273,6 @@ const Board = () => {
     dueDate.setHours(0, 0, 0, 0);
     return dueDate < today;
   };
-
-  
   const getPriorityLabel = (priority) => {
     switch (priority.toLowerCase()) {
       case "low":
@@ -236,7 +289,7 @@ const Board = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-    //Updates
+  //Updates
   const handleSaveTask = async (taskData) => {
     try {
       const task = await createTask(taskData);
@@ -408,168 +461,318 @@ const Board = () => {
   const renderTasks = (status) => {
     const statusOptions = ["Backlog", "To do", "In Progress", "Done"];
     const statusKey = status.toLowerCase().replace(/\s+/g, "");
-    const count = taskCounts[(statusKey || 0, 1)];
+    const count = taskCounts[statusKey || 0] || 2;
 
     if (isLoading) {
-      return Array(count)
-        .fill(0)
-        .map((_, index) => <SkeletonTaskCard key={index} />);
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+          }}
+        >
+          {Array(count)
+            .fill(0)
+            .map((_, index) => (
+              <div
+                key={`skeleton-${status}-${index}`}
+                style={{
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "20px",
+                  padding: "12px",
+                  height: "180px",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Title */}
+                <Skeleton
+                  height={24}
+                  width="80%"
+                  baseColor="#e0e0e0"
+                  highlightColor="#f0f0f0"
+                  style={{ marginBottom: "20px" }}
+                />
+
+                {/* Checklist */}
+                <Skeleton
+                  height={16}
+                  width="40%"
+                  baseColor="#e0e0e0"
+                  highlightColor="#f0f0f0"
+                  style={{ marginBottom: "30px" }}
+                />
+
+                {/* Checklist Items */}
+                {[...Array(2)].map((_, itemIndex) => (
+                  <div
+                    key={`checklist-item-${itemIndex}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <Skeleton
+                      height={16}
+                      width={16}
+                      circle
+                      baseColor="#e0e0e0"
+                      highlightColor="#f0f0f0"
+                      style={{ marginRight: "10px" }}
+                    />
+                    <Skeleton
+                      height={12}
+                      width="70%"
+                      baseColor="#e0e0e0"
+                      highlightColor="#f0f0f0"
+                    />
+                  </div>
+                ))}
+
+                {/* Footer */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Skeleton
+                    height={20}
+                    width="30%"
+                    baseColor="#e0e0e0"
+                    highlightColor="#f0f0f0"
+                  />
+                  <Skeleton
+                    height={20}
+                    width="40%"
+                    baseColor="#e0e0e0"
+                    highlightColor="#f0f0f0"
+                  />
+                </div>
+              </div>
+            ))}
+        </div>
+      );
     }
 
     return (
-      <div>
-        {tasks
-          .filter((task) => task.status.toLowerCase() === status.toLowerCase())
-          .map((task) => {
-            const otherStatuses = statusOptions.filter(
-              (s) => s.toLowerCase() !== task.status.toLowerCase()
-            );
+      <Droppable
+        droppableId={status}
+        type="TASK"
+        isDropDisabled={false}
+        ignoreContainerClipping
+      >
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            style={{
+              minHeight: "100px",
+              transition: "background-color 0.2s ease",
+              backgroundColor: snapshot.isDraggingOver
+                ? "rgba(135, 206, 250, 0.2)"
+                : "transparent",
+              borderRadius: "20px",
+            }}
+          >
+            {tasks
+              .filter(
+                (task) => task.status.toLowerCase() === status.toLowerCase()
+              )
+              .map((task, index) => {
+                const otherStatuses = statusOptions.filter(
+                  (s) => s.toLowerCase() !== task.status.toLowerCase()
+                );
 
-            const truncatedTitle =
-              task.title.split(" ").slice(0, 3).join(" ") +
-              (task.title.split(" ").length > 3 ? " ..." : "");
+                const truncatedTitle =
+                  task.title.split(" ").slice(0, 3).join(" ") +
+                  (task.title.split(" ").length > 3 ? " ..." : "");
 
-            return (
-              <div key={task._id} className={styles.taskCard}>
-                <div className={styles.taskHeader}>
-                  <div className={styles.priorityContainer}>
-                    <div
-                      className={`${styles.priorityIndicator} ${
-                        styles[task.priority.toLowerCase()]
-                      }`}
-                    />
-                    <p className={styles.priorityLabel}>
-                      {getPriorityLabel(task.priority)}
-                    </p>
-                    {task.assignedTo && (
+                return (
+                  <Draggable
+                    key={task._id}
+                    draggableId={task._id}
+                    index={index}
+                    type="TASK"
+                  >
+                    {(provided, snapshot) => (
                       <div
-                        className={styles.assigneeAvatar}
-                        data-tooltip-id={`assignee-${task._id}`}
-                        data-tooltip-content={task.assignedTo}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className={styles.taskCard}
+                        style={{
+                          ...provided.draggableProps.style,
+                          // Add a shadow when dragging
+                          boxShadow: snapshot.isDragging
+                            ? "0 0 10px rgba(0,0,0,0.3)"
+                            : "none",
+                        }}
                       >
-                        {getInitials(task.assignedTo)}
+                        <div className={styles.taskHeader}>
+                          <div className={styles.priorityContainer}>
+                            <div
+                              className={`${styles.priorityIndicator} ${
+                                styles[task.priority.toLowerCase()]
+                              }`}
+                            />
+                            <p className={styles.priorityLabel}>
+                              {getPriorityLabel(task.priority)}
+                            </p>
+                            {task.assignedTo && (
+                              <div
+                                className={styles.assigneeAvatar}
+                                data-tooltip-id={`assignee-${task._id}`}
+                                data-tooltip-content={task.assignedTo}
+                              >
+                                {getInitials(task.assignedTo)}
+                              </div>
+                            )}
+                            <Tooltip id={`assignee-${task._id}`} />
+                          </div>
+                          <img
+                            src={moreIcon}
+                            alt="More"
+                            className={styles.moreIcon}
+                            onClick={(e) => handleMenuToggle(task._id, e)}
+                          />
+                          {activeMenu === task._id && (
+                            <div
+                              ref={menuRef}
+                              className={styles.taskMenu}
+                              style={{
+                                top: menuPosition.top + 10,
+                                left: menuPosition.left - 80,
+                              }}
+                            >
+                              <p
+                                onClick={() =>
+                                  handleMenuAction("edit", task._id)
+                                }
+                              >
+                                Edit
+                              </p>
+                              <p onClick={() => handleShareClick(task._id)}>
+                                Share
+                              </p>
+                              <p
+                                onClick={() =>
+                                  handleMenuAction("delete", task._id)
+                                }
+                                className={styles.delete}
+                              >
+                                Delete
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        <h4
+                          className={styles.taskTitle}
+                          data-tooltip-id={`title-${task._id}`}
+                          data-tooltip-content={task.title}
+                        >
+                          {truncatedTitle}
+                        </h4>
+                        <Tooltip id={`title-${task._id}`} />
+                        <div className={styles.taskChecklistContainer}>
+                          <div className={styles.taskChecklist}>
+                            <p>
+                              Checklist (
+                              {
+                                task.checklist.filter((item) => item.completed)
+                                  .length
+                              }
+                              /{task.checklist.length})
+                            </p>
+                            <img
+                              src={downArrow}
+                              alt="Down Arrow"
+                              className={`${styles.downArrow} ${
+                                expandedTasks[task._id] ? styles.rotated : ""
+                              }`}
+                              onClick={() => handleShowSubTasks(task._id)}
+                            />
+                          </div>
+                          {expandedTasks[task._id] && (
+                            <div className={styles.subtaskList}>
+                              {task.checklist.map((item) => (
+                                <div
+                                  key={item._id}
+                                  className={styles.subtaskItem}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={item.completed}
+                                    onChange={() =>
+                                      handleSubtaskToggle(task._id, item._id)
+                                    }
+                                    className={styles.subtaskCheckbox}
+                                  />
+                                  <span className={styles.subtaskText}>
+                                    {item.task}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className={styles.taskFooter}>
+                          {task.dueDate ? (
+                            <span
+                              className={`${styles.dueDate} ${
+                                task.status.toLowerCase() === "done"
+                                  ? styles.doneDueDate
+                                  : isPastDate(task.dueDate)
+                                  ? styles.pastDueDate
+                                  : ""
+                              }`}
+                            >
+                              {formattedDueDate(task.dueDate)}
+                            </span>
+                          ) : (
+                            <div className={styles.dueDatePlaceholder}></div>
+                          )}
+
+                          <div className={styles.statusContainer}>
+                            {otherStatuses.map((statusOption) => (
+                              <span
+                                key={statusOption}
+                                className={
+                                  statusOption.toLowerCase() ===
+                                  task.status.toLowerCase()
+                                    ? styles.activeStatus
+                                    : ""
+                                }
+                                onClick={() =>
+                                  handleStatusChange(task._id, statusOption)
+                                }
+                              >
+                                {statusOption.toUpperCase()}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
-                    <Tooltip id={`assignee-${task._id}`} />
-                  </div>
-                  <img
-                    src={moreIcon}
-                    alt="More"
-                    className={styles.moreIcon}
-                    onClick={(e) => handleMenuToggle(task._id, e)}
-                  />
-                  {activeMenu === task._id && (
-                    <div
-                      ref={menuRef}
-                      className={styles.taskMenu}
-                      style={{
-                        top: menuPosition.top + 10,
-                        left: menuPosition.left - 80,
-                      }}
-                    >
-                      <p onClick={() => handleMenuAction("edit", task._id)}>
-                        Edit
-                      </p>
-                      <p onClick={() => handleShareClick(task._id)}>Share</p>
-                      <p
-                        onClick={() => handleMenuAction("delete", task._id)}
-                        className={styles.delete}
-                      >
-                        Delete
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <h4
-                  className={styles.taskTitle}
-                  data-tooltip-id={`title-${task._id}`}
-                  data-tooltip-content={task.title}
-                >
-                  {truncatedTitle}
-                </h4>
-                <Tooltip id={`title-${task._id}`} />
-                <div className={styles.taskChecklistContainer}>
-                  <div className={styles.taskChecklist}>
-                    <p>
-                      Checklist (
-                      {task.checklist.filter((item) => item.completed).length}/
-                      {task.checklist.length})
-                    </p>
-                    <img
-                      src={downArrow}
-                      alt="Down Arrow"
-                      className={`${styles.downArrow} ${
-                        expandedTasks[task._id] ? styles.rotated : ""
-                      }`}
-                      onClick={() => handleShowSubTasks(task._id)}
-                    />
-                  </div>
-                  {expandedTasks[task._id] && (
-                    <div className={styles.subtaskList}>
-                      {task.checklist.map((item) => (
-                        <div key={item._id} className={styles.subtaskItem}>
-                          <input
-                            type="checkbox"
-                            checked={item.completed}
-                            onChange={() =>
-                              handleSubtaskToggle(task._id, item._id)
-                            }
-                            className={styles.subtaskCheckbox}
-                          />
-                          <span className={styles.subtaskText}>
-                            {item.task}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className={styles.taskFooter}>
-                  {task.dueDate ? (
-                    <span
-                      className={`${styles.dueDate} ${
-                        task.status.toLowerCase() === "done"
-                          ? styles.doneDueDate
-                          : isPastDate(task.dueDate)
-                          ? styles.pastDueDate
-                          : ""
-                      }`}
-                    >
-                      {formattedDueDate(task.dueDate)}
-                    </span>
-                  ) : (
-                    <div className={styles.dueDatePlaceholder}></div>
-                  )}
-
-                  <div className={styles.statusContainer}>
-                    {otherStatuses.map((statusOption) => (
-                      <span
-                        key={statusOption}
-                        className={
-                          statusOption.toLowerCase() ===
-                          task.status.toLowerCase()
-                            ? styles.activeStatus
-                            : ""
-                        }
-                        onClick={() =>
-                          handleStatusChange(task._id, statusOption)
-                        }
-                      >
-                        {statusOption.toUpperCase()}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-      </div>
+                  </Draggable>
+                );
+              })}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     );
   };
 
   // Main return statement
   return (
-    <>
+    <DragDropContext
+      onDragEnd={onDragEnd}
+      dragHandleSelector=".task-drag-handle"
+    >
       <NavBar />
       <ToastContainer />
       <div className={styles.boardContainer}>
@@ -658,7 +861,7 @@ const Board = () => {
           }}
         />
       )}
-    </>
+    </DragDropContext>
   );
 };
 
