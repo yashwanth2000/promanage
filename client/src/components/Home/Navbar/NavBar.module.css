@@ -113,6 +113,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .modal {
@@ -123,6 +124,19 @@
   width: auto;
   height: auto;
   text-align: center;
+  opacity: 0;
+  animation: scaleUp 0.2s ease-in-out forwards;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .modal p {

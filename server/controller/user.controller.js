@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Task from "../models/task.model.js";
 import bcrypt from "bcrypt";
 import errorHandler from "../utils/error.js";
 import jwt from "jsonwebtoken";
@@ -101,11 +102,17 @@ export const deleteUser = async (req, res, next) => {
       return next(
         errorHandler(403, "You are not authorized to delete this account")
       );
+
+    // Find and delete all tasks created by the user
+    await Task.deleteMany({ createdBy: req.params.id });
+
+    // Delete the user
     await User.findByIdAndDelete(req.params.id);
 
-    res
-      .status(200)
-      .json({ success: true, message: "User deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "User account and all associated tasks deleted successfully",
+    });
   } catch (error) {
     next(error);
   }

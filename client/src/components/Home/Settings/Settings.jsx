@@ -191,28 +191,51 @@ const Settings = () => {
               onClick={toggleNewPasswordVisibility}
             />
           </div>
-          <button type="submit" className={styles.button}>
-            Update
-          </button>
-          <button
-            type="button"
-            className={styles.delButton}
-            onClick={toggleModal}
-          >
-            Delete User
-          </button>
+          <div className={styles.buttonContainer}>
+            <button type="submit" className={styles.updateButton}>
+              Update
+            </button>
+            <button
+              type="button"
+              className={styles.delButton}
+              onClick={toggleModal}
+            >
+              Delete User
+            </button>
+          </div>
         </form>
         {showModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.modal}>
-              <p>Are you sure you want to delete your account?</p>
+              <div className={styles.modalHeader}>
+                <h3 className={styles.modalTitle}>Delete Account</h3>
+              </div>
+              <div className={styles.modalDescription}>
+                <p>
+                  Are you sure you want to delete your account? This action
+                  cannot be undone and will permanently delete:
+                </p>
+                <ul className="list-disc pl-6 mt-2">
+                  <li>Your user account</li>
+                  <li>All tasks you have created</li>
+                  <li>All account information</li>
+                </ul>
+              </div>
               <div className={styles.modalButtons}>
-                <button onClick={handleDeleteAccount}>Yes, Delete</button>
-                <button onClick={toggleModal}>Cancel</button>
+                <button
+                  onClick={handleDeleteAccount}
+                  className={styles.deleteButton}
+                >
+                  Confirm Delete
+                </button>
+                <button onClick={toggleModal} className={styles.cancelButton}>
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
         )}
+
         <ToastContainer />
       </div>
     </>

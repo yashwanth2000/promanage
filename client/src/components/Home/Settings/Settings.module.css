@@ -1,110 +1,183 @@
 .settingsContainer {
   display: flex;
   flex-direction: column;
-  padding: 1.25rem;
+  padding: 2rem;
   min-height: 100vh;
   width: calc(100% - 11.25rem);
   margin-left: 11.25rem;
+  background-color: #f4f7f9;
+  align-items: center;
 }
 
 .settingsContainer h2 {
-  color: #000000;
+  color: #2c3e50;
   font-family: "Open Sans", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  text-align: left;
-  margin-left: 2.3rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.settingsContainer h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background-color: #17a2b8;
+  border-radius: 2px;
 }
 
 .updateForm {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  max-width: 400px;
-  padding: 2rem;
+  max-width: 450px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 2.5rem;
+  gap: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.updateForm:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
 }
 
 .inputContainer {
   position: relative;
   width: 100%;
   margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .inputIcon {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 15px;
   transform: translateY(-50%);
   width: 20px;
-  height: auto;
-  pointer-events: none;
+  height: 20px;
+  opacity: 0.6;
 }
 
 .inputField {
-  padding: 0.8rem 0.8rem 0.8rem 2.5rem;
-  margin-left: 0;
-  font-size: 1rem;
   width: 100%;
-  outline: none;
-  border: 1.38px solid #d0d0d0;
-  border-radius: 11.03px;
+  padding: 0.875rem 0.875rem 0.875rem 2.75rem;
+  border: 1.5px solid #e0e4e8;
+  border-radius: 10px;
+  font-size: 1rem;
 }
 
 .showIcon {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 15px;
   transform: translateY(-50%);
   width: 20px;
-  height: auto;
+  height: 20px;
   cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
 }
 
-.button {
-  padding: 0.5rem;
-  background-color: #17a2b8;
-  color: #fff;
+.showIcon:hover {
+  opacity: 1;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.updateButton,
+.delButton {
+  padding: 0.8rem 1.5rem;
+  color: #ffffff;
   border: none;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 1rem;
   font-family: "Open Sans", sans-serif;
   cursor: pointer;
-  border-radius: 55px;
-  width: 100%;
-  height: auto;
-  margin-top: 1.2rem;
+  border-radius: 12px;
+  width: auto;
   text-align: center;
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1;
 }
 
-.button:hover {
-  background-color: #138496;
+.updateButton::before,
+.delButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: all 0.6s ease;
+  z-index: -1;
+}
+
+.updateButton {
+  background-color: #17a2b8;
+  box-shadow: 0 4px 6px rgba(23, 162, 184, 0.2);
 }
 
 .delButton {
   background-color: #cf3636;
-  padding: 0.5rem;
-  color: #fff;
-  border: none;
-  font-weight: 400;
-  font-size: 1rem;
-  font-family: "Open Sans", sans-serif;
-  cursor: pointer;
-  border-radius: 55px;
-  width: 100%;
-  height: auto;
-  margin-top: 1.2rem;
-  text-align: center;
-  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(207, 54, 54, 0.2);
 }
 
+.updateButton:hover,
 .delButton:hover {
-  background-color: #b32f2f;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.updateButton:hover::before,
+.delButton:hover::before {
+  left: 100%;
+}
+
+.updateButton:active,
+.delButton:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.updateButton::after,
+.delButton::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.updateButton:hover::after,
+.delButton:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .modalOverlay {
@@ -118,62 +191,113 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .modal {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  max-width: 20%;
-  width: 300px;
-  height: auto;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
   text-align: center;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+  animation: scaleUp 0.3s ease-in-out;
 }
 
-.modal p {
-  color: #000000;
-  font-family: "Noto Sans", sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  text-align: center;
+@keyframes scaleUp {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
 }
+
+.modalHeader {
+  margin-bottom: 1rem;
+}
+
+.modalTitle {
+  color: #cf3636;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.modalDescription p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.modalDescription ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  text-align: left;
+  color: #666;
+  font-size: 1rem;
+}
+
 .modalButtons {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
 }
 
 .modalButtons button {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  margin-bottom: 1rem;
-  font-family: "Poppins", sans-serif;
-}
-
-.modalButtons button:first-child {
-  background-color: #17a2b8;
-  color: white;
-  box-shadow: 0px 2px 12px 0px #82698c33;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
   border-radius: 12px;
-  width: 100%;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  border: none;
 }
 
-.modalButtons button:first-child:hover {
+.modalButtons .deleteButton {
+  background-color: #17a2b8;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.modalButtons .deleteButton:hover {
   background-color: #138496;
+  transform: scale(1.05);
 }
 
-.modalButtons button:last-child {
+.modalButtons .cancelButton {
   background-color: #ffffff;
   color: #cf3636;
   border: 1px solid #cf3636;
-  border-radius: 12px;
-  width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
-.modalButtons button:last-child:hover {
+.modalButtons .cancelButton:hover {
   background-color: #cf3636;
   color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settingsContainer {
+    width: 100%;
+    margin-left: 0;
+    padding: 1rem;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .updateButton,
+  .delButton {
+    width: 100%;
+    max-width: 300px;
+  }
 }
